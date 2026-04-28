@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { motion, useTransform, useScroll, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 
 
 function FuturisticPage() {
 
-    const x = useMotionValue(0)
-    const opacity = useTransform(x, [-100, 0, 100], [0, 1, 0])
+    const x = useMotionValue(0);
     const [isRotated, setIsRotated] = useState(false);
     const [isMovedUp, setIsMovedUp] = useState(false);
     const [isZoomUp, setIsZoomUp] = useState(false);

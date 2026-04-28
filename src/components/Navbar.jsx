@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom'
-import Newsvg from './New';
 import { motion } from 'framer-motion';
-import logo from '../assets/Logo.svg'
 
 
 

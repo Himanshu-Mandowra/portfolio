@@ -89,7 +89,7 @@ function About() {
           </div>
 
           <div className="social">
-            <a href="#" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
               <i className='bx bxl-instagram'></i>
             </a>
             <a href="https://x.com/Gentle_Himanshu" target="_blank" rel="noopener noreferrer">
