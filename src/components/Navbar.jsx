@@ -52,9 +52,9 @@ function Navbar() {
     const [isResponsive, setIsResponsive] = useState(false);
 
     // Function to toggle the responsive class
-    const toggleResponsive = () => {
-        setIsResponsive(!isResponsive);
-    };
+    // const toggleResponsive = () => {
+    //     setIsResponsive(!isResponsive);
+    // };
 
     return (
         <nav id="navbar">
