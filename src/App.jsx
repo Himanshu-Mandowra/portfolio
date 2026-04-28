@@ -15,6 +15,7 @@ import './styles/Nav.css';
 import './styles/Services.css';
 import './styles/Startpage.css';
 import './styles/Contact.css';
+import AIChatBot from './components/AIChatBot/AIChatBot';
 
 function App() {
   return (
@@ -27,12 +28,12 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/service" element={<Services />} />
           </Routes>
-          <div class=" z-10 anime">
-            <div class="first">
+          <div className=" z-10 anime">
+            <div className="first">
               <h1>Himanshu</h1>
             </div>
             
-            <div class="scnd">
+            <div className="scnd">
               <h1>Mandowra</h1>
             </div>
             <Navbar />
@@ -46,6 +47,7 @@ function App() {
           <Project/>
           <Divider />
           <Contact />
+          <AIChatBot />
         </div>
       </Router>
     </>
