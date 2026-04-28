@@ -49,7 +49,7 @@ function Navbar() {
         document.getElementById('Project').scrollIntoView({ behavior: 'smooth' });
     };
     // State to track if the navbar is responsive
-    const [isResponsive, setIsResponsive] = useState(false);
+    // const [isResponsive, setIsResponsive] = useState(false);
 
     // Function to toggle the responsive class
     // const toggleResponsive = () => {
