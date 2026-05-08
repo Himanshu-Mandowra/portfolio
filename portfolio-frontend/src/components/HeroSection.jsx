@@ -35,7 +35,7 @@ function HeroSection() {
                     <h1 data-text='Himanshu Mandowra...'>Himanshu Mandowra</h1>
                     <span id="element"></span>
                     <p>Passionate web developer with experience in designing and implementing dynamic websites and applications.</p>
-                    <a href="./assets/Resume - Himanshu.docx" download>
+                    <a href="/Himanshu_Mandowra_FullStack_Resume (1).pdf" download>
                         <button className="one btn">Download CV</button>
                     </a>
                     <Link onClick={scrollToContact} to="/"><button className="two btn">Hire Me Now</button></Link>
