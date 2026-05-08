@@ -1,3 +1,5 @@
+import { Resume } from "../models/resume.model.js";
+
 export const updateResume = async (req, res) => {
   try {
     const { id } = req.params;
@@ -13,7 +15,7 @@ export const updateResume = async (req, res) => {
         success: false,
         message: "Resume not found",
       });
-    }
+    } 
 
     res.status(200).json({
       success: true,

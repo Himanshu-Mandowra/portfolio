@@ -1,14 +1,15 @@
 import express from "express";
 import { createResume } from "../controllers/resume.controller.js";
 import { updateResume } from "../controllers/updateResume.controller.js";
-import { generateSummary } from "../controllers/GenerateSummary.controller.js";
 import { getResume } from "../controllers/getResume.controller.js";
+import { generateSummary } from "../controllers/summaryPost.controller.js";
+import { getSummary } from "../controllers/summaryGet.controller.js";
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/resume/create:
+ * /api/v1/resume/create:
  *   post:
  *     summary: Create a new resume
  *     tags: [Resume]
@@ -100,7 +101,7 @@ router.post("/create", createResume);
 
 /**
  * @swagger
- * /api/resume/update/{id}:
+ * /api/v1/resume/update/{id}:
  *   put:
  *     summary: Update a resume
  *     tags: [Resume]
@@ -122,27 +123,11 @@ router.post("/create", createResume);
  */
 router.put("/update/:id", updateResume);
 
-/**
- * @swagger
- * /api/resume/generate-summary/{id}:
- *   post:
- *     summary: Generate summary for a resume
- *     tags: [Resume]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Summary generated successfully
- */
-router.post("/generate-summary/:id", generateSummary);
+
 
 /**
  * @swagger
- * /api/resume/get:
+ * /api/v1/resume/get:
  *   get:
  *     summary: Get a resumes
  *     tags: [Resume]
@@ -153,5 +138,45 @@ router.post("/generate-summary/:id", generateSummary);
  *         description: Resume not found
  */
 router.get("/get", getResume);
+/**
+ * @swagger
+ * /api/v1/resume/summary:
+ *   post:
+ *     summary: Generate a resume summary
+ *     tags: [Summary]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 example: "Frontend developer with React and Node.js experience"
+ *     responses:
+ *       200:
+ *         description: Summary generated successfully
+ *       400:
+ *         description: Invalid request
+ *       500:
+ *         description: Summary generation failed
+ */
+router.post("/summary", generateSummary);
+/**
+ * @swagger
+ * /api/v1/resume/get/summary:
+ *   get:
+ *     summary: Get Summary
+ *     tags: [Summary]
+ *     responses:
+ *       200:
+ *         description: Summary generated successfully
+ *       400:
+ *         description: Invalid request
+ *       500:
+ *         description: Summary generation failed
+ */
+router.get("/get/summary", getSummary);
 
 export default router;

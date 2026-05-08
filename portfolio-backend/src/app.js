@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import resumeRoutes from "./routes/resume.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
+import userRouter from './routes/user.routes.js'
 
 const app = express()
 
@@ -20,9 +21,8 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 //Routes
-import userRouter from './routes/user.routes.js'
 
 app.use("/api/v1/users", userRouter)
-app.use("/api/resume", resumeRoutes);
+app.use("/api/v1/resume", resumeRoutes);
 
 export { app }
