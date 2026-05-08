@@ -40,7 +40,17 @@ function AIChatBot() {
 
       setChat((prev) => [...prev, { sender: "bot", text: reply }]);
     } catch (error) {
-      console.log(error);
+      console.log("Full Error:", error);
+
+      console.log("Response Data:", error.response?.data);
+      if(error.response?.data?.error?.code === 429){
+        setChat((prev) => [
+          ...prev,
+          { sender: "bot", text: "The AI is tired of working for free. Please try again later 😒" },
+        ]);
+        return;
+      }
+
       setChat((prev) => [
         ...prev,
         { sender: "bot", text: "Something went wrong. Please try again." },
