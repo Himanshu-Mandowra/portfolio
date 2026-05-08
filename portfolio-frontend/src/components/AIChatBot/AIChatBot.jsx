@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PostMessage } from "../../service/APIChatBot";
 import "./AIChatBot.css";
+import { getSummary } from "../../service/resume.api";
 
 function AIChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState([]);
+
+  const SummaryGet = async () => {
+    try {
+      const res = await getSummary();
+      setSummary(res.data);
+      console.log("this is data from file", res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -18,29 +30,8 @@ function AIChatBot() {
     setLoading(true);
 
     try {
-      const prompt = `
-You are Himanshu's portfolio assistant.
-
-Himanshu is a Frontend / Full Stack Developer with 1+ year of experience in building real-world web applications. He specializes in React.js, Next.js, JavaScript, and responsive UI development, along with REST API integration.
-
-He also has 6 months of backend experience using Node.js and basic ASP.NET, working on CRUD operations, API development, and server-side logic.
-
-He has worked on projects like APS Matrix and APS Admission Panel, where he developed dynamic dashboards, integrated APIs, and built scalable UI components.
-
-His technical skills include React.js, Next.js, JavaScript, HTML, CSS, Tailwind CSS, Node.js, REST APIs, MySQL basics, and Git.
-
-He is focused on improving his full stack capabilities and building efficient, scalable applications.
-
-He is up for on-site and wfh, depends on distance.
-
-He is currently working on AI features and models.
-
-He already used AI's in his development, like know how to use AI (just for memory).
-
-Answer all user questions professionally, clearly, and briefly based only on this information.
-
-User Question: ${userMessage}
-      `;
+      console.log("This is summary from file:", summary[0].content);
+      const prompt = ` ${summary[0].content} and do not answer like I provided you the description, just behiave like a assistent of mine and do not go too high, keep the conversation sort and professional and remember evertime you are talking to the HR or my portfolio visitor not me and if I use code 1720 than I am directly talking to you non-other just me and as I type exit with code then back to assistent profile for visitors and all always so just keep this in mind and answers smarty, and if any weired or stupid question asked then answer it like they deserve or roast them. User Question: ${userMessage}`;
 
       const res = await PostMessage(prompt);
 
@@ -58,6 +49,10 @@ User Question: ${userMessage}
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    SummaryGet();
+  }, []);
 
   return (
     <div className="ai-chatbot-widget">

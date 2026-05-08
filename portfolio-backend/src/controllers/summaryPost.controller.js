@@ -4,8 +4,7 @@ import { Summary } from "../models/summary.model.js";
 export const generateSummary = async (req, res) => {
     try {
         const data = req.body;
-        const newSummary = new Summary(data);
-        await newSummary.save();
+        const newSummary = await Summary.findOneAndUpdate({}, data, { new: true, upsert: true });
 
         res.status(201).json({
             success: true,
