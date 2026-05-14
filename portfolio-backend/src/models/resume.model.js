@@ -50,7 +50,6 @@ const resumeSchema = new Schema(
       fileSize: Number
     },
 
-    summary: String
   },
   {
     timestamps: true

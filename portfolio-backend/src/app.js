@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import resumeRoutes from "./routes/resume.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
 import userRouter from './routes/user.routes.js'
@@ -24,5 +25,6 @@ app.use(cookieParser())
 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/resume", resumeRoutes);
+app.use("/api/v1/ai", chatRoutes);
 
 export { app }

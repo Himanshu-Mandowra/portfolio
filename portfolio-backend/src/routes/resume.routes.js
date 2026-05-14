@@ -4,6 +4,8 @@ import { updateResume } from "../controllers/updateResume.controller.js";
 import { getResume } from "../controllers/getResume.controller.js";
 import { generateSummary } from "../controllers/summaryPost.controller.js";
 import { getSummary } from "../controllers/summaryGet.controller.js";
+import { uploadAndParseResume } from "../controllers/UploadResume.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = express.Router();
 
@@ -124,6 +126,33 @@ router.post("/create", createResume);
 router.put("/update/:id", updateResume);
 
 
+/**
+ * @swagger
+ * /api/v1/resume/upload:
+ *   post:
+ *     summary: Upload resume PDF and auto generate fields
+ *     tags: [Resume]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               resume:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Resume parsed successfully
+ *       500:
+ *         description: Failed to parse resume
+ */
+router.post(
+  "/upload",
+  upload.single("resume"),
+  uploadAndParseResume
+);
 
 /**
  * @swagger

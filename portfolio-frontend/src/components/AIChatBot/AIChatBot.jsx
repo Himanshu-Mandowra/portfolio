@@ -36,7 +36,7 @@ function AIChatBot() {
       const res = await PostMessage(prompt);
       console.log("Full Response:", res);
 
-      const reply = res?.choices[0]?.message?.content || "No response";
+      const reply = res?.reply || "No response";
 
       setChat((prev) => [...prev, { sender: "bot", text: reply }]);
     } catch (error) {

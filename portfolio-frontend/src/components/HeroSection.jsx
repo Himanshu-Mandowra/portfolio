@@ -9,7 +9,7 @@ function HeroSection() {
     useEffect(() => {
         // Options for the Typed instance
         const options = {
-            strings: ['Web Developer', 'Python',  'HTML, CSS, Tailwind CSS', 'front-end Developer', 'JavaScript', 'React JS', 'Node Js', 'MongoDB, Git, Figma'],
+            strings: ['Web Developer',  'HTML, CSS, Tailwind', 'Full-Stack Developer', 'JavaScript', 'React JS, Next JS', 'Node Js, Express', 'MongoDB, MySql', 'Git, GitHub, Figma'],
             typeSpeed: 60,
             loop: true
         };
