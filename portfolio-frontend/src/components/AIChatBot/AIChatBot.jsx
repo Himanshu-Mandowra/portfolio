@@ -30,23 +30,26 @@ function AIChatBot() {
     setLoading(true);
 
     try {
-      console.log("This is summary from file:", summary[0].content);
+      console.log("This is summary from file:", summary[0]?.content);
       const prompt = ` ${summary[0].content} and do not answer like I provided you the description, just behiave like a assistent of mine and do not go too high, keep the conversation sort and professional and remember evertime you are talking to the HR or my portfolio visitor not me and if I use code 1720 than I am directly talking to you non-other just me and as I type exit with code then back to assistent profile for visitors and all always so just keep this in mind and answers smarty, and if any weired or stupid question asked then answer it like they deserve or roast them. User Question: ${userMessage}`;
 
       const res = await PostMessage(prompt);
+      console.log("Full Response:", res);
 
-      const reply =
-        res?.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+      const reply = res?.choices[0]?.message?.content || "No response";
 
       setChat((prev) => [...prev, { sender: "bot", text: reply }]);
     } catch (error) {
       console.log("Full Error:", error);
 
       console.log("Response Data:", error.response?.data);
-      if(error.response?.data?.error?.code === 429){
+      if (error.response?.data?.error?.code === 429) {
         setChat((prev) => [
           ...prev,
-          { sender: "bot", text: "The AI is tired of working for free. Please try again later 😒" },
+          {
+            sender: "bot",
+            text: "The AI is tired of working for free. Please try again later 😒",
+          },
         ]);
         return;
       }

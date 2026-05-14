@@ -2,21 +2,23 @@ import axios from "axios";
 
 export const PostMessage = async (message) => {
   const res = await axios.post(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+    process.env.REACT_APP_GROQ_BASE_URL,
     {
-      contents: [
+      model: "llama-3.3-70b-versatile",
+      messages: [
         {
-          parts: [{ text: message }],
+          role: "user",
+          content: message,
         },
       ],
     },
     {
       headers: {
         "Content-Type": "application/json",
-        "X-goog-api-key": process.env.REACT_APP_GEMINI_API_KEY,
+        Authorization: `Bearer ${process.env.REACT_APP_GROQ_API_KEY}`,
       },
     }
   );
 
-  return res;
+  return res.data;
 };
