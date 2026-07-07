@@ -4,7 +4,7 @@ import { updateResume } from "../controllers/updateResume.controller.js";
 import { getResume } from "../controllers/getResume.controller.js";
 import { generateSummary } from "../controllers/summaryPost.controller.js";
 import { getSummary } from "../controllers/summaryGet.controller.js";
-import { uploadAndParseResume } from "../controllers/UploadResume.controller.js";
+import { uploadAndParseResume } from "../controllers/uploadResume.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = express.Router();
