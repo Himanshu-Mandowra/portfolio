@@ -1,8 +1,11 @@
 import dotenv from "dotenv"
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
+import dns from "node:dns";
 
 console.log("MONGO_URI:", process.env.MONGODB_URI)
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config({
     path:'./env'
