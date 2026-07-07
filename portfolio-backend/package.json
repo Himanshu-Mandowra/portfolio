@@ -2,9 +2,10 @@
   "name": "backend-practice-project",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon -r dotenv/config src/index.js"
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "start": "node src/index.js"
   },
   "keywords": [
     "javascript",
@@ -32,6 +33,7 @@
     "multer": "^2.1.1",
     "pdf-parse": "^1.1.4",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "typescript": "^6.0.3"
   }
 }
