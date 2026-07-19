@@ -64,14 +64,14 @@ function HeroSection() {
             <a
               href="/Himanshu_Mandowra_FullStack_Resume (1).pdf"
               download
-              className="inline-flex items-center justify-center rounded-lg border-2 border-amber-400 bg-amber-400 px-8 py-3.5 text-base font-medium text-white transition duration-300 hover:-translate-y-1 hover:bg-transparent hover:text-amber-400"
+              className="inline-flex items-center justify-center rounded-lg border-2 border-amber-400 bg-amber-400 px-8 py-3.5 text-base font-medium text-black transition duration-300 hover:-translate-y-1 hover:bg-transparent hover:!text-amber-400"
             >
               Download CV
             </a>
             <Link
               onClick={scrollToContact}
               to="/"
-              className="inline-flex items-center justify-center rounded-lg border-2 border-[#141414] bg-[#141414] px-8 py-3.5 text-base font-medium text-white transition duration-300 hover:-translate-y-1 hover:border-white hover:bg-white hover:text-[#141414]"
+              className="inline-flex items-center justify-center rounded-lg border-2 border-[#141414] bg-[#141414] px-8 py-3.5 text-base font-medium text-white transition duration-300 hover:-translate-y-1 hover:border-white hover:bg-white hover:!text-[#141414]"
             >
               Hire Me Now
             </Link>
