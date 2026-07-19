@@ -1,124 +1,61 @@
-import React, { useState, useEffect, useRef } from 'react';
-import emailjs from 'emailjs-com';
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import React from "react";
+
+const socialLinks = [
+  {
+    label: "GitHub",
+    href: "https://github.com/Himanshu-Mandowra"
+  },
+  {
+    label: "LinkedIn",
+    href: "http://www.linkedin.com/in/himanshu-mandowra"
+  },
+  {
+    label: "Twitter",
+    href: "https://x.com/Gentle_Himanshu"
+  }
+];
 
 function Contact() {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isSubmitting },
-  } = useForm();
-
-  const [responseMessage, setResponseMessage] = useState('');
-  const formRef = useRef(null); // Create a ref for the form element
-
-  useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    const copyrightText = `© ${currentYear} by Himanshu Mandowra. All rights reserved.`;
-    const copyrightElement = document.getElementById('copyright');
-    if (copyrightElement) {
-      copyrightElement.textContent = copyrightText;
-    }
-  }, []); // Empty dependency array means this effect runs once after the initial render
-
-  const submitTemp = async (data) => {
-    try {
-      if (formRef.current) {
-        // Pass the form element reference to emailjs
-        await emailjs.sendForm('service_2nib78g', 'template_bo3vf4i', formRef.current, 'LQvI0NJt-BCDntiHf');
-        setResponseMessage('Message sent successfully.');
-      }
-    } catch (error) {
-      console.error(error);
-      setResponseMessage('Failed to send message.');
-    }
-
-    // Example condition for blocked user
-    if (data.username === 'Jatin') {
-      setError('blocked', { message: 'Sorry, user Jatin is blocked!' });
-    }
-  };
-
   return (
-    <section className="contact" id="contact">
-      <div className="top-bar">
-        <div className="top-bar-one">Contact</div>
-        <div className="underline"></div>
+    <section className="mx-auto w-full max-w-6xl py-12 md:py-16" id="contact">
+      <div className="mb-7">
+        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400/10 px-4 py-2 text-sm uppercase tracking-[0.05em] text-amber-400">
+          Contact
+        </div>
+        <h2 className="mt-4 max-w-3xl font-['Arsenal_SC'] text-4xl leading-tight text-[#f6f1e8] md:text-5xl">
+          Let&apos;s build something clean, useful, and memorable.
+        </h2>
       </div>
 
-      <div className="middle-bar">
-        <div className="left">
-          <div className="social">
-            <div className="i-one">
-              <Link to="/https://x.com/Himshu_Mandowra?t=v99mUW0-63kJSzYymIbSnA&s=09"><i className='bx bxl-twitter'></i> Twitter</Link>
-              <Link to="/http://www.linkedin.com/in/himanshu-mandowra"><i className='bx bxl-linkedin'></i> LinkedIn</Link>
-              <Link to="/https://github.com/Himanshu-Mandowra"><i className='bx bxl-github'></i> GitHub</Link>
-            </div>
-          </div>
+      <div className="grid gap-6 rounded-[28px] border border-white/10 bg-neutral-900/90 p-7 shadow-[0_24px_80px_rgba(0,0,0,0.28)] md:grid-cols-[1.2fr_0.8fr]">
+        <div>
+          <h3 className="mb-2 text-xl font-semibold text-[#f6f1e8]">
+            Open to freelance work, collaborations, and product builds.
+          </h3>
+          <p className="leading-7 text-stone-400">
+            If you want a modern site, a frontend refresh, or a simple backend
+            integration, I can help turn it into a polished result.
+          </p>
+          <a
+            className="mt-5 inline-flex w-fit items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-[#f6f1e8] transition hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-amber-400/10"
+            href="mailto:himanshu.mandowra1234@gmail.com"
+          >
+            himanshu.mandowra1234@gmail.com
+          </a>
         </div>
 
-        <div className="line2"></div>
-        <div className="right">
-          <form ref={formRef} onSubmit={handleSubmit(submitTemp)}>
-            <label htmlFor="name">Name:</label>
-            <br />
-            <input
-              placeholder="username"
-              {...register("username", {
-                required: { value: true, message: "Username is required" },
-                minLength: { value: 3, message: "Minimum length should be 3" },
-                maxLength: { value: 16, message: "Maximum length should be 16" }
-              })}
-              type="text"
-              id="username"
-            />
-            <br />
-            {errors.username && <span className="text-red-700">{errors.username.message}</span>}
-            <br />
-
-            <label htmlFor="email">Email:</label>
-            <br />
-            <input
-              placeholder="email"
-              {...register("email", {
-                required: { value: true, message: "Email is required" },
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email address"
-                }
-              })}
-              type="email"
-              id="email"
-            />
-            <br />
-            {errors.email && <span className="text-red-700">{errors.email.message}</span>}
-            <br />
-
-            <label htmlFor="message">Message:</label>
-            <br />
-            <textarea
-              placeholder="Enter Your Message"
-              id="message"
-              {...register("message", { required: { value: true, message: "Message is required" } })}
-            ></textarea>
-            <br />
-            {isSubmitting && <div>Loading...</div>}
-            <input disabled={isSubmitting} type="submit" value="Send" />
-            <br />
-            {errors.blocked && <span className="text-red-700">{errors.blocked.message}</span>}
-          </form>
-          {responseMessage && <p>{responseMessage}</p>}
-        </div>
-      </div>
-
-      <div className="footer">
-        <div className="Email">
-          <Link to="#"><i className='bx bxl-gmail no-underline'></i> -/ Email - himanshu.mandowra1234@gmail.com /-</Link>
-          <div className="copy">
-            <p id="copyright">© 2024 by Himanshu Mandowra. All rights reserved.</p>
-          </div>
+        <div className="grid content-start gap-3">
+          {socialLinks.map((item) => (
+            <a
+              key={item.label}
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-[#f6f1e8] transition hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-amber-400/10"
+              href={item.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {item.label}
+            </a>
+          ))}
         </div>
       </div>
     </section>

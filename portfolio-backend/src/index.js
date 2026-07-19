@@ -6,20 +6,28 @@ import connectDB from "./db/index.js";
 import { app } from "./app.js";
 import dns from "node:dns";
 
-
-
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
-console.log("MONGO_URI:", process.env.MONGODB_URI)
+const port = process.env.PORT || 8000;
 
-connectDB()
-    .then(() => {
-        app.listen(process.env.PORT || 8000, () => {
-            console.log(`Server is running at port: ${process.env.PORT}`)
+const startServer = () => {
+    app.listen(port, () => {
+        console.log(`Server is running at port: ${port}`);
+    });
+};
+
+if (process.env.MONGODB_URI) {
+    connectDB()
+        .then(() => {
+            startServer();
         })
-    })
-    .catch((err) => {
-        console.log("MONGO db connection failed !!!! ", err)
-    })
+        .catch((err) => {
+            console.log("MONGO db connection failed. Starting without DB.", err.message);
+            startServer();
+        });
+} else {
+    console.log("MONGODB_URI not set. Starting without DB.");
+    startServer();
+}
 
 
 

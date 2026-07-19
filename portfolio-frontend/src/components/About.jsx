@@ -1,111 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React from "react";
 
 function About() {
-
-    useEffect(() => {
-        // Add 'visible' class to the 'about' and 'section1' sections
-        const aboutSection = document.getElementById('about');
-        if (aboutSection) {
-            aboutSection.classList.add('visible');
-        }
-    }, []);
-
-    // State to manage the expanded/collapsed state
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    // Function to toggle the expanded/collapsed state
-    const myFunction = () => {
-        setIsExpanded(!isExpanded);
-    };
-
-    return (
-        <section className="about" id="about"  data-aos="zoom-in">
-      <div className="top-bar">
-        <div className="top-bar-one">About</div>
-        <div className="underline"></div>
+  return (
+    <section className="mx-auto w-full max-w-6xl py-12 md:py-16" id="about">
+      <div className="mb-7">
+        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400/10 px-4 py-2 text-sm uppercase tracking-[0.05em] text-amber-400">
+          About
+        </div>
+        <h2 className="mt-4 max-w-3xl font-['Arsenal_SC'] text-4xl leading-tight text-[#f6f1e8] md:text-5xl">
+          Focused on shipping clean products with thoughtful details.
+        </h2>
       </div>
 
-      <div className="middle-bar">
-        <div className="text-1">
-          <div className="heading">
-            <div className="line"></div>
-            <div className="head">About me</div>
-          </div>
-          <div className="para">
-            <div className="abc1">
-              Hello, I'm Himanshu Mandowra, a dedicated web developer and emerging content creator. With
-              expertise in web development and a deep interest in technology and DevOps, I specialize in
-              crafting dynamic, high-performance digital solutions that merge creativity with technical
-              precision.
-            </div>
+      <div className="grid gap-5 md:grid-cols-2">
+        <article className="rounded-3xl border border-white/10 bg-neutral-900/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+          <h3 className="mb-2 text-lg font-semibold text-[#f6f1e8]">About me</h3>
+          <p className="leading-7 text-stone-400">
+            I am a web developer who enjoys turning ideas into smooth digital
+            products. My work combines UI clarity, practical engineering, and a
+            steady focus on maintainable code.
+          </p>
+          <p className="mt-4 leading-7 text-stone-400">
+            I work mostly with JavaScript, React, Node.js, Express, and modern
+            frontend styling. I care about interfaces that feel fast, readable,
+            and easy to trust.
+          </p>
+        </article>
 
-            <div className="abc2">
-              <p>
-                I specialize in front-end web development, with strong proficiency in HTML, CSS, JavaScript,
-                and React.js. My technical skills are complemented by a keen eye for design, enabling me to
-                create seamless, user-friendly websites. Additionally,{' '}
-                <span id="dots">{isExpanded ? '' : '...'}</span>{' '}
-                <span id="more" style={{ display: isExpanded ? 'inline' : 'none' }}>
-                  I have experience with both SQL and NoSQL databases, ensuring efficient data management and retrieval. I am also currently expanding my expertise by learning DevOps to enhance my development workflow and deployment processes.
-                </span>
-                <button onClick={myFunction} className="btn" id="myBtn">
-                  {isExpanded ? 'Read less' : 'Read more'}
-                </button>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="line"></div>
-        <div className="text-2" data-aos="zoom-in">
-          <div className="heading">
-            <div className="line"></div>
-            <div className="head">My work</div>
-          </div>
-          <div className="para" data-aos="zoom-in">
-            <div className="abc1">
-              Cell (Central Electronics Limited) 
-              <br />
-              <b> Duration: </b> One Month
-              <br />
-              <br />
-              <b> Discription: </b>
-              <br />
-              Designed a highly engaging and user-friendly website.
-              Created an attractive UI and worked on both front-end and back-end development.
-              <br />
-              Managed the database to ensure seamless functionality.
-              This experience honed my skills in full-stack development and allowed me to contribute effectively to a live project.
-            </div>
-            <div className="abc2">
-              {/* Add any additional content or remove if not needed */}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="fotter" data-aos="fade-right">
-        <div className="connect">
-          <div className="text">
-            <div>CHECK OUT MY :</div>
-          </div>
-
-          <div className="social">
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
-              <i className='bx bxl-instagram'></i>
-            </a>
-            <a href="https://x.com/Gentle_Himanshu" target="_blank" rel="noopener noreferrer">
-              <i className='bx bxl-twitter'></i>
-            </a>
-            <a href="http://www.linkedin.com/in/himanshu-mandowra" target="_blank" rel="noopener noreferrer">
-              <i className='bx bxl-linkedin'></i>
-            </a>
-            <a href="https://github.com/Himanshu-Mandowra" target="_blank" rel="noopener noreferrer">
-              <i className='bx bxl-github'></i>
-            </a>
-          </div>
-        </div>
+        <article className="rounded-3xl border border-white/10 bg-neutral-900/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+          <h3 className="mb-2 text-lg font-semibold text-[#f6f1e8]">Experience snapshot</h3>
+          <p className="leading-7 text-stone-400">
+            At Central Electronics Limited, I contributed to a live project by
+            designing the interface, building frontend and backend features, and
+            supporting database work for a smoother product experience.
+          </p>
+          <p className="mt-4 leading-7 text-stone-400">
+            That hands-on experience strengthened my full-stack workflow and
+            taught me how to keep real project delivery simple and structured.
+          </p>
+        </article>
       </div>
     </section>
-    );
+  );
 }
 
 export default About;

@@ -1,0 +1,18 @@
+[
+  {
+    "_id": "0f2e7997-c978-468d-a6a7-85350d421d6f",
+    "title": "Discord Tool Bot",
+    "description": "A customizable Discord ticket system with private support channels, role-based staff management, configurable ticket panels, and automatic ticket transcripts.",
+    "link": "https://gentle-bot.vercel.app/",
+    "image": "https://res.cloudinary.com/dh7qnzsbb/image/upload/v1784472569/0a8d60af-c579-4676-b9a9-508f307202a0.png",
+    "createdAt": "2026-07-19T14:43:41.331Z"
+  },
+  {
+    "_id": "seed-project-1",
+    "title": "Portfolio Platform",
+    "description": "A personal portfolio with a clean dark theme, protected admin project management, and a structured frontend-backend flow.",
+    "link": "https://github.com/Himanshu-Mandowra",
+    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",
+    "createdAt": "2026-07-19T00:00:00.000Z"
+  }
+]

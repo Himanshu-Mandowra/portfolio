@@ -1,97 +1,85 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from "react";
+import { getProjects } from "../service/projects.api";
 
+const fallbackProjects = [
+  {
+    _id: "fallback-1",
+    title: "Portfolio Platform",
+    description:
+      "A personal portfolio with focused branding, project management, and a protected admin flow.",
+    link: "#",
+    image:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80"
+  }
+];
 
-function FuturisticPage() {
+function Project() {
+  const [projects, setProjects] = useState(fallbackProjects);
+  const [error, setError] = useState("");
 
-    // const x = useMotionValue(0);
-    const [isRotated, setIsRotated] = useState(false);
-    const [isMovedUp, setIsMovedUp] = useState(false);
-    const [isZoomUp, setIsZoomUp] = useState(false);
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const data = await getProjects();
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data);
+        }
+      } catch (loadError) {
+        setError("Projects API is not available right now.");
+      }
+    };
 
-    const handleClick = () => {
-        setIsMovedUp(!isMovedUp);
-        setIsRotated(!isRotated);
-        setIsZoomUp(!isZoomUp);
+    loadProjects();
+  }, []);
 
-    }
+  return (
+    <section className="mx-auto w-full max-w-6xl py-12 md:py-16" id="projects">
+      <div className="mb-7">
+        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400/10 px-4 py-2 text-sm uppercase tracking-[0.05em] text-amber-400">
+          Projects
+        </div>
+        <h2 className="mt-4 max-w-3xl font-['Arsenal_SC'] text-4xl leading-tight text-[#f6f1e8] md:text-5xl">
+          Selected work with clear goals, strong UI, and usable delivery.
+        </h2>
+      </div>
 
-
-
-
-
-    return (
-        <div id='Project' className="w-full overflow-hidden Project h-[100vh]  bg-[#222] flex items-center justify-center text-white">
-            <div className='flex justify-center lg:w-[30%]  w-full ' >
-                <div className="w-[120%] flex text-center justify-center  items-center ">
-
-                    <div className="text-[47px] lg:w-[90%] w-[60%] flex flex-col items-center justify-center">
-                        <motion.div className="z-2 up p-10 bg-orange-800 h-[16vh] w-full overflow-hidden border-8 border-white border-solid rounded-t-[22px] border-b-0"
-                            animate={{ y: isMovedUp ? -100 : 0 }} // Moves the element upward by 100px
-                            transition={{ stiffness: 300, delay: 0.5 }}
-                        //  style={{ transformOrigin: 'top center' }} // Rotate from the top edge
-                        >
-
-                        </motion.div>
-                        <motion.div className="z-2 down bg-orange-800 h-[18vh] w-full overflow-hidden border-8 border-white border-solid p-0"
-                            animate={{ y: isMovedUp ? 100 : 0 }} // Moves the element downward by 100px
-                            transition={{ stiffness: 300, delay: 0.5 }}
-                        >
-
-                        </motion.div>
-                    </div>
-                </div>
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {projects.map((project) => (
+          <article
+            key={project._id || project.title}
+            className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/90 shadow-[0_24px_80px_rgba(0,0,0,0.28)]"
+          >
+            <div className="aspect-[16/10] overflow-hidden">
+              <img
+                src={project.image}
+                alt={project.title}
+                className="h-full w-full object-cover transition duration-300 hover:scale-105"
+              />
             </div>
-            <div className="text-[17px] absolute lg:w-[50%] w-full flex justify-center">
-                <motion.div className="flex sm:border-0 border-dashed rounded-full border-l-2 border-l-transparent border-r-2 border-r-transparent  items-center justify-center down  p-6 text-white border--orange-500 h-[20vh] w-[50%] overflow-hidden border-3"
-                    animate={{ scale: isZoomUp ? 1 : 0 }} // Moves the element downward by 100px
-                    transition={{ stiffness: 300, delay: 0.5 }}
 
-                >
-                    <motion.button className=' z-1 cursor-pointer text-white sm:font-light lg:font-bold py-2 px-4 rounded hover:bg-custom-blue-dark focus:outline-none focus:ring-2 focus:ring-custom-blue focus:ring-opacity-50'
-                        initial={{ background: 'linear-gradient(to right, #1e40af, #3b82f6)' }}
-                        whileHover={{
-                            scale: 1.2,
-                            background: 'linear-gradient(to right, #f43f5e, #f97316)',  // Reverse colors on hover
-                        }}   // Slightly enlarge on hover
-                        
-                        whileTap={{ scale: 0.3 }}
-                        animate={{ y: ["0%", "-20%", "0%"], scale: [1, 1.05, 1], padding: 5 }}  // Floating effect
-                        transition={{
-                            duration: 5,        // Duration of one cycle
-                            ease: "easeInOut",  // Easing function
-                            repeat: Infinity,   // Repeat indefinitely
-                            repeatType: "loop" , // Loop the animation
-                            times: [0, 0.5, 1]        // Keyframes to ensure smooth transitions
-                        }}
-                    >
-
-                        Enter Projects
-
-                    </motion.button>
-
-                </motion.div>
+            <div className="p-6">
+              <h3 className="mb-2 text-lg font-semibold text-[#f6f1e8]">{project.title}</h3>
+              <p className="leading-7 text-stone-400">{project.description}</p>
+              <a
+                className="mt-5 inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-[#f6f1e8] transition hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-amber-400/10"
+                href={project.link}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open project
+              </a>
             </div>
-            <div className="absolute w-full flex justify-center">
-                <motion.div
-                    onClick={handleClick}
-                    className="z-2 border-5 border-pink-950 border-b-8 border-b-pink-950 w-6 h-9 bg-blue-500 cursor-pointer"
-                    animate={{ rotate: isRotated ? 90 : 0, y: isMovedUp ? -100 : 0 }}
-                    transition={{
-                        rotate: { type: 'spring', stiffness: 300 },
-                        y: {
-                            stiffness: 300, delay: 0.5 // Delay for the y animation
-                        }
-                    }}
+          </article>
+        ))}
+      </div>
 
-                    style={{ originY: 0 }}  // Set the origin to the top
-
-                // animate={{ y: [0, -10, 0] }}
-                // transition={{ duration: 1, repeat: Infinity }}
-                />
-            </div>
-        </div >
-    );
+      {error ? (
+        <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">
+          {error}
+        </div>
+      ) : null}
+    </section>
+  );
 }
 
-export default FuturisticPage;
+export default Project;

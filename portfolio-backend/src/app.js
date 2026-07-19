@@ -6,6 +6,8 @@ import chatRoutes from "./routes/chat.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
 import userRouter from './routes/user.routes.js'
+import projectRouter from "./routes/project.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 const app = express()
 
@@ -29,5 +31,7 @@ app.use(cookieParser())
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/resume", resumeRoutes);
 app.use("/api/v1/ai", chatRoutes);
+app.use("/api/v1/projects", projectRouter);
+app.use("/api/v1/admin", adminRouter);
 
 export { app }
