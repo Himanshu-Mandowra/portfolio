@@ -70,6 +70,10 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variables file
+build/
+dist/
+build-tailwind-check/
+.env.local
 .env
 .env.test
 .env.production
