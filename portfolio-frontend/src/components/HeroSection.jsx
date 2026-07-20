@@ -62,7 +62,7 @@ function HeroSection() {
 
           <div className="mt-8 flex flex-wrap gap-4">
             <a
-              href="/Himanshu_Mandowra_FullStack_Resume (1).pdf"
+              href="/Himanshu_Mandowra_Resume.pdf"
               download
               className="inline-flex items-center justify-center rounded-lg border-2 border-amber-400 bg-amber-400 px-8 py-3.5 text-base font-medium text-black transition duration-300 hover:-translate-y-1 hover:bg-transparent hover:!text-amber-400"
             >
