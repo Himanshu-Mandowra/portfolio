@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { waitForBackendHealth } from "../service/health.api";
 import { soundEngine } from "../utils/soundEngine";
 
 export function UmbrellaOctagonSVG({ className = "h-16 w-16", spin = true }) {
@@ -34,8 +35,11 @@ export function UmbrellaOctagonSVG({ className = "h-16 w-16", spin = true }) {
 
 function RequiemLoader({ onStartReveal, onComplete }) {
   const [progress, setProgress] = useState(0);
+  const [backendReady, setBackendReady] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(1);
   const [exiting, setExiting] = useState(false);
   const [glitchBurst, setGlitchBurst] = useState(false);
+  const backendReadyRef = useRef(false);
 
   // Sync saved theme immediately so loader matches Dark, Light, or B&W mode
   useEffect(() => {
@@ -45,17 +49,44 @@ function RequiemLoader({ onStartReveal, onComplete }) {
     } catch {}
   }, []);
 
+  // Always ping Render backend health API until the server wakes up and responds
+  useEffect(() => {
+    const { promise, cancel } = waitForBackendHealth({
+      intervalMs: 2000,
+      onAttempt: (n) => setAttemptCount(n),
+    });
+
+    promise.then(() => {
+      backendReadyRef.current = true;
+      setBackendReady(true);
+    });
+
+    return () => cancel();
+  }, []);
+
+  // Advance progress bar: holds at 94% until Render backend responds, then completes to 100%
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
+        if (backendReadyRef.current) {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          const fastStep = Math.max(4, Math.ceil((100 - prev) * 0.35));
+          return Math.min(100, prev + fastStep);
         }
-        const increment = Math.floor(Math.random() * 6) + 3;
-        return Math.min(100, prev + increment);
+
+        // Backend is still starting on Render -> smoothly approach 94% and wait
+        if (prev < 72) {
+          return Math.min(72, prev + Math.floor(Math.random() * 4) + 2);
+        }
+        if (prev < 94) {
+          return Math.random() > 0.45 ? prev + 1 : prev;
+        }
+        return 94;
       });
-    }, 38);
+    }, 60);
 
     return () => clearInterval(interval);
   }, []);
@@ -74,8 +105,9 @@ function RequiemLoader({ onStartReveal, onComplete }) {
     }
   }, [progress]);
 
+  // Only reveal page once backendReady is true AND progress reaches 100
   useEffect(() => {
-    if (progress === 100 && !exiting) {
+    if (backendReady && progress === 100 && !exiting) {
       const startExitTimer = setTimeout(() => {
         setExiting(true);
         onStartReveal?.();
@@ -87,7 +119,7 @@ function RequiemLoader({ onStartReveal, onComplete }) {
 
       return () => clearTimeout(startExitTimer);
     }
-  }, [progress, exiting, onStartReveal, onComplete]);
+  }, [backendReady, progress, exiting, onStartReveal, onComplete]);
 
   return (
     <motion.div
@@ -132,7 +164,7 @@ function RequiemLoader({ onStartReveal, onComplete }) {
         className="flex flex-col items-center text-center"
       >
         <span
-          className="font-mono-tech text-[10px] font-semibold uppercase tracking-[0.38em] sm:text-[11px]"
+          className="font-tech-label text-[11px] font-semibold uppercase tracking-[0.38em] sm:text-xs"
           style={{ color: "var(--text-muted)" }}
         >
           WELCOME TO
@@ -140,13 +172,13 @@ function RequiemLoader({ onStartReveal, onComplete }) {
 
         <div className="mt-3 flex items-center gap-3 sm:gap-4">
           <span
-            className="font-requiem text-3xl font-black italic tracking-tighter sm:text-5xl"
+            className="font-orbitron text-3xl font-black italic tracking-tighter sm:text-5xl"
             style={{ color: "var(--text-primary)" }}
           >
             {"//"}
           </span>
           <h1
-            className="font-requiem text-3xl font-extrabold uppercase tracking-[0.14em] sm:text-5xl"
+            className="font-orbitron text-3xl font-black uppercase tracking-[0.14em] sm:text-5xl"
             style={{ color: "var(--text-primary)" }}
           >
             HIMANSHU
@@ -154,7 +186,7 @@ function RequiemLoader({ onStartReveal, onComplete }) {
         </div>
       </motion.div>
 
-      {/* Bottom Minimalist Line + Numeric Counter (e.g. —————— 64) */}
+      {/* Bottom Minimalist Line + Numeric Counter + Backend Health Status */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={
@@ -162,26 +194,39 @@ function RequiemLoader({ onStartReveal, onComplete }) {
             ? { opacity: 0, y: -16, transition: { duration: 0.3 } }
             : { opacity: 1, y: 0, transition: { delay: 0.1, duration: 0.45 } }
         }
-        className="flex items-center gap-5 pb-1"
+        className="flex flex-col items-center gap-2 pb-1"
       >
-        <div
-          className="relative h-[1.5px] w-44 overflow-hidden sm:w-52"
-          style={{ backgroundColor: "var(--border-color)" }}
-        >
-          <motion.div
-            className="h-full"
-            style={{ backgroundColor: "var(--text-primary)" }}
-            initial={{ width: "0%" }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.08, ease: "linear" }}
-          />
+        <div className="flex items-center gap-5">
+          <div
+            className="relative h-[1.5px] w-44 overflow-hidden sm:w-52"
+            style={{ backgroundColor: "var(--border-color)" }}
+          >
+            <motion.div
+              className="h-full"
+              style={{ backgroundColor: "var(--text-primary)" }}
+              initial={{ width: "0%" }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.08, ease: "linear" }}
+            />
+          </div>
+
+          <span
+            className="font-tech-label w-8 text-right text-xs font-semibold tabular-nums tracking-wider"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {progress}
+          </span>
         </div>
 
         <span
-          className="w-7 text-right font-mono-tech text-xs font-bold tabular-nums tracking-wider"
-          style={{ color: "var(--text-primary)" }}
+          className="font-code-tagline text-[10px] uppercase tracking-[0.2em]"
+          style={{ color: "var(--text-muted)" }}
         >
-          {progress}
+          {backendReady
+            ? "BACKEND SERVER ONLINE"
+            : attemptCount > 2
+            ? `WAKING RENDER SERVER (PING #${attemptCount})...`
+            : "CONNECTING TO BACKEND SERVER..."}
         </span>
       </motion.div>
     </motion.div>

@@ -11,20 +11,31 @@ import adminRouter from "./routes/admin.routes.js";
 
 const app = express()
 
-app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
-}))
+app.use(
+    cors({
+        origin:
+            !process.env.CORS_ORIGIN || process.env.CORS_ORIGIN === "*"
+                ? true
+                : process.env.CORS_ORIGIN.split(",").map((o) => o.trim()),
+        credentials: true,
+    })
+);
 
 app.get("/", (req, res) => {
     res.send("Hello AWS!!");
 });
-app.get("/health", (req, res) => {
+const healthHandler = (req, res) => {
     res.status(200).json({
         status: "ok",
+        active: true,
+        message: "Backend server is active",
         uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
     });
-});
+};
+
+app.get("/health", healthHandler);
+app.get("/api/v1/health", healthHandler);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json({ limit: "15mb" }))
