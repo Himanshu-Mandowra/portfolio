@@ -646,13 +646,48 @@ const JOURNEY_STAGES = [
 
 function MissionLog({ theme = "dark" }) {
   const [selectedStage, setSelectedStage] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(null);
   const isBW = theme === "bw";
   const isLight = theme === "light";
+  const totalStages = JOURNEY_STAGES.length;
+
+  React.useEffect(() => {
+    if (isPaused || selectedStage) return undefined;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % totalStages);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [isPaused, selectedStage, totalStages]);
+
+  const handleTouchStart = (e) => {
+    setIsPaused(true);
+    setTouchStartX(e.touches?.[0]?.clientX ?? null);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX !== null && e.changedTouches?.[0]) {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 36) {
+        soundEngine.playClick();
+        if (diff > 0) {
+          setActiveIndex((prev) => (prev + 1) % totalStages);
+        } else {
+          setActiveIndex((prev) => (prev - 1 + totalStages) % totalStages);
+        }
+      }
+    }
+    setTouchStartX(null);
+    setTimeout(() => setIsPaused(false), 1800);
+  };
 
   return (
     <section
-      className="relative mx-auto flex min-h-[calc(100vh-80px)] w-full max-w-7xl flex-col justify-center py-8 md:py-10"
+      className="relative mx-auto flex w-full max-w-6xl flex-col justify-center py-6 md:py-8"
       id="missions"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
       {/* Animated Header Matching Portfolio Theme System */}
       <motion.div
@@ -660,13 +695,13 @@ function MissionLog({ theme = "dark" }) {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="mx-auto mb-6 max-w-2xl text-center"
+        className="mx-auto mb-5 max-w-2xl text-center"
       >
         <span className="theme-badge inline-flex items-center justify-center rounded-full px-3.5 py-1 font-mono-tech text-xs font-bold uppercase tracking-[0.2em]">
           03 {"//"} EXPERIENCE &amp; JOURNEY
         </span>
 
-        <h2 className="mt-2.5 font-requiem text-2xl font-bold uppercase tracking-[0.06em] theme-text-primary sm:text-4xl">
+        <h2 className="mt-2 font-requiem text-2xl font-bold uppercase tracking-[0.06em] theme-text-primary sm:text-3xl">
           FROM{" "}
           <span
             className={
@@ -691,14 +726,155 @@ function MissionLog({ theme = "dark" }) {
           </span>
         </h2>
 
-        <p className="mt-1.5 text-xs theme-text-secondary sm:text-sm">
+        <p className="mt-1 text-xs theme-text-secondary sm:text-sm">
           A timeline of my engineering progression, active full-stack role, and
           production deliveries.
         </p>
       </motion.div>
 
-      {/* Compact 1-Screen 4-Column Staggered Journey Showcase */}
-      <div className="relative">
+      {/* MOBILE / TABLET (< lg): Center-Bigger + Left/Right Peeking Auto-Slideshow */}
+      <div
+        className="relative lg:hidden"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="relative mx-auto flex h-[340px] w-full items-center justify-center overflow-hidden">
+          {JOURNEY_STAGES.map((stage, idx) => {
+            const rel = (idx - activeIndex + totalStages) % totalStages;
+            const isCenter = rel === 0;
+            const isRight = rel === 1;
+            const isLeft = rel === totalStages - 1;
+
+            const xOffset = isCenter
+              ? "0%"
+              : isLeft
+              ? "-62%"
+              : isRight
+              ? "62%"
+              : "0%";
+            const cardScale = isCenter ? 1 : isLeft || isRight ? 0.82 : 0.68;
+            const cardOpacity = isCenter ? 1 : isLeft || isRight ? 0.56 : 0;
+            const cardZ = isCenter ? 30 : isLeft || isRight ? 20 : 5;
+
+            const periodClass = isBW ? "text-neutral-200" : stage.periodColor;
+            const badgeClass = isBW
+              ? "border border-white/40 bg-white/10 text-white"
+              : stage.badgeStyle;
+            const ringClass = isBW
+              ? "border-white text-white shadow-[0_0_15px_rgba(255,255,255,0.35)]"
+              : stage.nodeRing;
+
+            return (
+              <motion.div
+                key={stage.number}
+                animate={{
+                  x: xOffset,
+                  scale: cardScale,
+                  opacity: cardOpacity,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 240,
+                  damping: 26,
+                }}
+                style={{
+                  zIndex: cardZ,
+                  pointerEvents: isCenter || isLeft || isRight ? "auto" : "none",
+                }}
+                onClick={() => {
+                  soundEngine.playClick();
+                  if (isCenter) {
+                    setSelectedStage(
+                      selectedStage?.number === stage.number ? null : stage
+                    );
+                  } else {
+                    setActiveIndex(idx);
+                  }
+                }}
+                className="absolute w-[74%] max-w-[300px] cursor-pointer sm:w-[58%]"
+              >
+                <article
+                  className={`theme-surface flex flex-col items-center rounded-2xl p-4 transition-all ${
+                    isCenter ? "ring-2 ring-[var(--accent)] shadow-2xl" : ""
+                  }`}
+                >
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <span
+                      className={`font-mono-tech text-[11px] font-bold uppercase tracking-wider ${periodClass}`}
+                    >
+                      {stage.period}
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 font-mono-tech text-[9px] font-bold uppercase ${badgeClass}`}
+                    >
+                      {stage.badge}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 flex w-full items-center justify-between gap-2">
+                    <h3 className="font-requiem text-sm font-bold leading-snug theme-text-primary sm:text-base">
+                      {stage.title}
+                    </h3>
+                    <span
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border font-mono-tech text-[10px] font-extrabold ${ringClass}`}
+                    >
+                      {stage.number}
+                    </span>
+                  </div>
+
+                  <p className="mt-1.5 line-clamp-2 w-full text-xs leading-relaxed theme-text-secondary">
+                    {stage.description}
+                  </p>
+
+                  <div className="mt-3 flex w-full items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      {stage.icons.map((iconType, i) => (
+                        <TechBadgeIcon
+                          key={i}
+                          type={iconType}
+                          isBW={isBW}
+                          isLight={isLight}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-1 scale-90">
+                    <IsometricPedestal
+                      type={stage.pedestal}
+                      isBW={isBW}
+                      isLight={isLight}
+                    />
+                  </div>
+                </article>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Mobile Carousel Dots & Controls */}
+        <div className="mt-2 flex items-center justify-center gap-2">
+          {JOURNEY_STAGES.map((st, idx) => (
+            <button
+              key={st.number}
+              type="button"
+              onClick={() => {
+                soundEngine.playClick();
+                setActiveIndex(idx);
+              }}
+              aria-label={`Slide ${idx + 1}`}
+              className={`h-2 rounded-full transition-all ${
+                idx === activeIndex
+                  ? "w-6 bg-[var(--accent)]"
+                  : "w-2 bg-slate-500/40"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* DESKTOP (lg+): Compact 4-Column Staggered Journey Showcase with Auto-Slide Highlight */}
+      <div className="relative hidden lg:block">
         {/* Self-Drawing Animated S-Curve Ribbon Wave Behind Nodes (Desktop) */}
         <svg
           viewBox="0 0 1200 180"
@@ -772,18 +948,15 @@ function MissionLog({ theme = "dark" }) {
           />
         </svg>
 
-        {/* 4 Staggered Journey Columns with System-Error Jiggle + Fade-Up */}
-        <div className="relative z-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+        {/* 4 Staggered Journey Columns with System-Error Jiggle + Auto-Slide Focus */}
+        <div className="relative z-10 grid grid-cols-4 gap-4">
           {JOURNEY_STAGES.map((stage, idx) => {
-            const periodClass = isBW
-              ? "text-neutral-200"
-              : stage.periodColor;
+            const isActiveSlide = idx === activeIndex;
+            const periodClass = isBW ? "text-neutral-200" : stage.periodColor;
             const badgeClass = isBW
               ? "border border-white/40 bg-white/10 text-white"
               : stage.badgeStyle;
-            const lineClass = isBW
-              ? "border-white/50"
-              : stage.lineColor;
+            const lineClass = isBW ? "border-white/50" : stage.lineColor;
             const ringClass = isBW
               ? "border-white text-white shadow-[0_0_15px_rgba(255,255,255,0.35)]"
               : stage.nodeRing;
@@ -802,12 +975,20 @@ function MissionLog({ theme = "dark" }) {
                 <article
                   onClick={() => {
                     soundEngine.playClick();
+                    setActiveIndex(idx);
                     setSelectedStage(
                       selectedStage?.number === stage.number ? null : stage
                     );
                   }}
-                  onMouseEnter={() => soundEngine.playHover()}
-                  className="theme-surface group relative w-full cursor-pointer rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1"
+                  onMouseEnter={() => {
+                    soundEngine.playHover();
+                    setActiveIndex(idx);
+                  }}
+                  className={`theme-surface group relative w-full cursor-pointer rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 ${
+                    isActiveSlide
+                      ? "ring-2 ring-[var(--accent)] -translate-y-1"
+                      : "opacity-85 hover:opacity-100"
+                  }`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span
@@ -822,8 +1003,8 @@ function MissionLog({ theme = "dark" }) {
                     </span>
                   </div>
 
-                  <div className="mt-2.5 flex items-start justify-between gap-2">
-                    <h3 className="font-requiem text-base font-bold leading-snug theme-text-primary">
+                  <div className="mt-2 flex items-start justify-between gap-2">
+                    <h3 className="font-requiem text-sm font-bold leading-snug theme-text-primary sm:text-base">
                       {stage.title}
                     </h3>
                     <button
@@ -843,7 +1024,7 @@ function MissionLog({ theme = "dark" }) {
                     {stage.description}
                   </p>
 
-                  <div className="mt-3.5 flex items-center gap-2">
+                  <div className="mt-3 flex items-center gap-2">
                     {stage.icons.map((iconType, i) => (
                       <TechBadgeIcon
                         key={i}

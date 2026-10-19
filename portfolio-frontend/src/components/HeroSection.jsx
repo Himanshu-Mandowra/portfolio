@@ -146,16 +146,14 @@ function HeroSection({
             <span id="element" className="truncate font-medium theme-text-primary" />
           </motion.div>
 
-          {/* Description & body text -> Inter (400–500) */}
+          {/* Description & body text -> Very short and slightly bigger (Inter 400–500) */}
           <motion.p
             variants={sysErrorFadeUp}
-            className="font-body-inter mt-4 max-w-2xl text-sm font-normal leading-relaxed theme-text-secondary sm:text-base"
+            className="font-body-inter mt-3.5 max-w-xl text-base font-normal leading-relaxed theme-text-secondary sm:text-lg lg:text-xl"
           >
-            Full-Stack Developer with{" "}
+            Full-Stack Engineer with{" "}
             <strong className="font-medium theme-text-primary">1.5+ years</strong>{" "}
-            of professional experience building scalable web applications, secure
-            REST APIs, and modern responsive user interfaces with React, Next.js,
-            Node.js, NestJS, and SQL/NoSQL databases.
+            of experience building scalable web apps, secure APIs, and modern UI.
           </motion.p>
 
           {/* Stats & technical labels -> Rajdhani (600) */}

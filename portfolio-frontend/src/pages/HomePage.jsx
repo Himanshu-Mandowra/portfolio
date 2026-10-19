@@ -8,7 +8,6 @@ import Project from "../components/Project";
 import Services from "../components/Services";
 import AIChatBot from "../components/AIChatBot/AIChatBot";
 import RequiemThreeBackground from "../components/RequiemThreeBackground";
-import TacticalHudBar from "../components/TacticalHudBar";
 
 function HomePage({ revealReady = true }) {
   const [theme, setTheme] = useState(() => {
@@ -18,7 +17,6 @@ function HomePage({ revealReady = true }) {
       return "dark";
     }
   });
-  const [outbreakMode, setOutbreakMode] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -28,9 +26,9 @@ function HomePage({ revealReady = true }) {
   }, [theme]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-transparent">
-      {/* Beginner-Friendly Three.js Background adapting to Dark, Light & B&W themes */}
-      <RequiemThreeBackground outbreakMode={outbreakMode} theme={theme} />
+    <div className="relative min-h-screen w-full [overflow-x:clip] bg-transparent">
+      {/* Three.js Background adapting to Dark, Light & B&W themes */}
+      <RequiemThreeBackground outbreakMode={false} theme={theme} />
 
       {/* Subtle Grid Overlay */}
       <div className="re-lattice-overlay pointer-events-none fixed inset-0 z-0" />
@@ -40,32 +38,22 @@ function HomePage({ revealReady = true }) {
         <Navbar
           theme={theme}
           setTheme={setTheme}
-          outbreakMode={outbreakMode}
+          outbreakMode={false}
           revealReady={revealReady}
         />
-        <main className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <main className="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
           <HeroSection
-            outbreakMode={outbreakMode}
+            outbreakMode={false}
             revealReady={revealReady}
             theme={theme}
           />
-          <About
-            outbreakMode={outbreakMode}
-            theme={theme}
-            onCureOutbreak={() => setOutbreakMode(false)}
-          />
+          <About outbreakMode={false} theme={theme} />
           <MissionLog theme={theme} />
           <Project theme={theme} />
-          <Services />
-          <Contact />
+          <Services theme={theme} />
+          <Contact theme={theme} />
         </main>
       </div>
-
-      {/* Minimal Bottom HUD & Easter Egg Bar */}
-      <TacticalHudBar
-        outbreakMode={outbreakMode}
-        setOutbreakMode={setOutbreakMode}
-      />
 
       {/* AI Portfolio Assistant */}
       <AIChatBot />

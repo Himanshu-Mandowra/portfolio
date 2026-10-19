@@ -65,8 +65,11 @@ function Project({ theme = "dark" }) {
   const [projects, setProjects] = useState(fallbackProjects);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(null);
 
   const previewCardRef = useRef(null);
+  const mobileCardRef = useRef(null);
 
   const [inspectedProject, setInspectedProject] = useState(null);
   const [originRect, setOriginRect] = useState(null);
@@ -94,6 +97,18 @@ function Project({ theme = "dark" }) {
     loadProjects();
   }, []);
 
+  const total = projects.length;
+  const activeProject = projects[currentIndex] || projects[0];
+
+  // Auto-slide every 4s unless paused or examining in 3D
+  useEffect(() => {
+    if (isPaused || inspectedProject || total <= 1) return undefined;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % total);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isPaused, inspectedProject, total]);
+
   useEffect(() => {
     if (!inspectedProject) return;
     const onKeyDown = (e) => {
@@ -105,9 +120,6 @@ function Project({ theme = "dark" }) {
     return () => window.removeEventListener("keydown", onKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inspectedProject]);
-
-  const total = projects.length;
-  const activeProject = projects[currentIndex] || projects[0];
 
   const handlePrev = () => {
     soundEngine.playClick();
@@ -124,9 +136,31 @@ function Project({ theme = "dark" }) {
     setCurrentIndex(idx);
   };
 
+  const handleMobileTouchStart = (e) => {
+    setIsPaused(true);
+    setTouchStartX(e.touches?.[0]?.clientX ?? null);
+  };
+
+  const handleMobileTouchEnd = (e) => {
+    if (touchStartX !== null && e.changedTouches?.[0]) {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 36) {
+        soundEngine.playClick();
+        if (diff > 0) {
+          setCurrentIndex((prev) => (prev + 1) % total);
+        } else {
+          setCurrentIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
+        }
+      }
+    }
+    setTouchStartX(null);
+    setTimeout(() => setIsPaused(false), 1800);
+  };
+
   const handleOpenExamine = (project, sourceEl) => {
     soundEngine.playSaveRoomChord();
-    const targetEl = sourceEl || previewCardRef.current;
+    const targetEl =
+      sourceEl || previewCardRef.current || mobileCardRef.current;
     const rect = targetEl?.getBoundingClientRect?.() || {
       top: window.innerHeight / 2 - 150,
       left: window.innerWidth / 2 - 240,
@@ -155,14 +189,17 @@ function Project({ theme = "dark" }) {
 
   const handleCloseExamine = () => {
     soundEngine.playClick();
-    if (previewCardRef.current) {
-      const latestRect = previewCardRef.current.getBoundingClientRect();
-      setOriginRect({
-        top: latestRect.top,
-        left: latestRect.left,
-        width: latestRect.width,
-        height: latestRect.height,
-      });
+    const refEl = previewCardRef.current || mobileCardRef.current;
+    if (refEl) {
+      const latestRect = refEl.getBoundingClientRect();
+      if (latestRect.width > 0) {
+        setOriginRect({
+          top: latestRect.top,
+          left: latestRect.left,
+          width: latestRect.width,
+          height: latestRect.height,
+        });
+      }
     }
     setAnimStage("closing");
     setTimeout(() => {
@@ -227,8 +264,8 @@ function Project({ theme = "dark" }) {
     : ["React", "Node.js", "Tailwind CSS"];
 
   const getExaminePositionStyle = () => {
-    const targetWidth = Math.min(window.innerWidth * 0.88, 760);
-    const targetHeight = Math.min(window.innerHeight * 0.66, 460);
+    const targetWidth = Math.min(window.innerWidth * 0.88, 720);
+    const targetHeight = Math.min(window.innerHeight * 0.64, 430);
     const centerTop = (window.innerHeight - targetHeight) / 2 - 20;
     const centerLeft = (window.innerWidth - targetWidth) / 2;
 
@@ -261,30 +298,35 @@ function Project({ theme = "dark" }) {
   };
 
   return (
-    <section className="mx-auto w-full max-w-7xl py-10 md:py-12" id="projects">
+    <section
+      className="mx-auto w-full max-w-5xl py-6 md:py-8"
+      id="projects"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       {/* Animated Header + Slideshow Controls */}
       <motion.div
         variants={sysErrorFadeUp}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.25 }}
-        className="mb-6 flex flex-wrap items-end justify-between gap-4"
+        className="mb-4 flex flex-wrap items-end justify-between gap-3"
       >
         <div>
           <span className="theme-badge inline-flex rounded-full px-3 py-1 font-mono-tech text-xs font-bold uppercase tracking-[0.18em]">
             04 {"//"} ARCHIVAL CASE FILES
           </span>
-          <h2 className="mt-2 font-requiem text-2xl font-bold uppercase tracking-[0.06em] theme-text-primary sm:text-4xl">
+          <h2 className="mt-1.5 font-requiem text-2xl font-bold uppercase tracking-[0.06em] theme-text-primary sm:text-3xl">
             PROJECT <span className="theme-accent-text">SPOTLIGHT</span>
           </h2>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             type="button"
             onClick={handlePrev}
             onMouseEnter={() => soundEngine.playHover()}
-            className="re-requiem-btn-ghost group px-4 py-2 text-xs"
+            className="re-requiem-btn-ghost group px-3.5 py-1.5 text-xs"
             aria-label="Previous project"
           >
             <span className="transition-transform duration-200 group-hover:-translate-x-1">
@@ -296,7 +338,7 @@ function Project({ theme = "dark" }) {
             type="button"
             onClick={handleNext}
             onMouseEnter={() => soundEngine.playHover()}
-            className="re-requiem-btn group px-4 py-2 text-xs"
+            className="re-requiem-btn group px-3.5 py-1.5 text-xs"
             aria-label="Next project"
           >
             <span>Next</span>
@@ -307,7 +349,142 @@ function Project({ theme = "dark" }) {
         </div>
       </motion.div>
 
-      {/* Main Wide 1-Screen Spotlight Stage with Stacked Print Deck + Dossier */}
+      {/* ====================================================================
+          MOBILE VIEW (< lg): Image-Only Slide with Content Inside Faded/Blurred Side
+          ==================================================================== */}
+      {activeProject && (
+        <div
+          className="lg:hidden"
+          onTouchStart={handleMobileTouchStart}
+          onTouchEnd={handleMobileTouchEnd}
+        >
+          <div
+            ref={mobileCardRef}
+            className="theme-surface relative mx-auto aspect-[4/4.6] w-full max-w-md overflow-hidden rounded-2xl shadow-2xl sm:aspect-[16/11]"
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeProject._id || activeProject.title}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+                className="relative h-full w-full"
+              >
+                {/* Full-Bleed Slide Image */}
+                <img
+                  src={activeProject.image}
+                  alt={activeProject.title}
+                  draggable={false}
+                  className={`h-full w-full object-cover ${
+                    isBW ? "grayscale contrast-110" : ""
+                  }`}
+                />
+
+                {/* Top Floating Index & 3D Examine Trigger */}
+                <div className="absolute inset-x-3 top-3 z-20 flex items-center justify-between gap-2">
+                  <span className="rounded-md border border-white/25 bg-black/75 px-2.5 py-1 font-mono-tech text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                    0{currentIndex + 1} {"//"} {activeProject.category || "PROJECT"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleOpenExamine(activeProject, mobileCardRef.current)
+                    }
+                    className="rounded-md border border-white/35 bg-black/75 px-2.5 py-1 font-mono-tech text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md"
+                  >
+                    ⌖ 3D INSPECT
+                  </button>
+                </div>
+
+                {/* Blurred + Faded Content-Side Image Overlay (Bottom 66% of Image) */}
+                <div
+                  className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-[68%] bg-gradient-to-t from-black/95 via-black/80 to-transparent backdrop-blur-[6px]"
+                  style={{
+                    WebkitMaskImage:
+                      "linear-gradient(to top, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%)",
+                    maskImage:
+                      "linear-gradient(to top, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%)",
+                  }}
+                />
+
+                {/* Content Inside the Image on the Blurred/Faded Side */}
+                <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col justify-end p-4 text-white">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-requiem text-lg font-bold uppercase tracking-wide text-white drop-shadow">
+                      {activeProject.title}
+                    </h3>
+                    <span className="rounded border border-white/25 bg-white/10 px-2 py-0.5 font-mono-tech text-[9px] font-bold uppercase text-neutral-200">
+                      {activeProject.clearance || "VERIFIED"}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-200/95">
+                    {activeProject.description}
+                  </p>
+
+                  <div className="mt-2.5 flex flex-wrap gap-1">
+                    {techList.slice(0, 4).map((tech) => (
+                      <span
+                        key={tech}
+                        className="rounded border border-white/20 bg-white/10 px-2 py-0.5 font-mono-tech text-[10px] font-semibold uppercase text-white backdrop-blur-sm"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/15 pt-2.5">
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={activeProject.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => soundEngine.playClick()}
+                        className="rounded border border-white/30 bg-white/15 px-3 py-1 font-mono-tech text-[11px] font-bold uppercase tracking-wider text-white backdrop-blur-md transition hover:bg-white/25"
+                      >
+                        Live ↗
+                      </a>
+                      {activeProject.codeLink && (
+                        <a
+                          href={activeProject.codeLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={() => soundEngine.playClick()}
+                          className="rounded border border-white/25 bg-black/50 px-3 py-1 font-mono-tech text-[11px] font-bold uppercase tracking-wider text-neutral-200 backdrop-blur-md"
+                        >
+                          GitHub ↗
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Slide Dots Inside Image */}
+                    <div className="flex items-center gap-1.5">
+                      {projects.map((p, idx) => (
+                        <button
+                          key={p._id || idx}
+                          type="button"
+                          onClick={() => handleSelectSlide(idx)}
+                          aria-label={`Slide ${idx + 1}`}
+                          className={`h-1.5 rounded-full transition-all ${
+                            idx === currentIndex
+                              ? "w-5 bg-white"
+                              : "w-1.5 bg-white/40"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          DESKTOP VIEW (lg+): Compact Spotlight Stage with Stacked Deck + Dossier
+          ==================================================================== */}
       {activeProject && (
         <motion.div
           variants={sysErrorCard}
@@ -315,14 +492,14 @@ function Project({ theme = "dark" }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="theme-surface overflow-hidden rounded-2xl"
+          className="theme-surface hidden overflow-hidden rounded-2xl lg:block"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-[1.18fr_0.82fr]">
-            {/* Left Side: Resident Evil Requiem Stacked Photographic Print Deck */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr]">
+            {/* Left Side: Compact Stacked Photographic Print Deck */}
             <div
               onMouseMove={handleCardMouseMove}
               onMouseLeave={() => setTilt({ x: 0, y: 0 })}
-              className={`re-lattice-overlay relative flex flex-col justify-between overflow-hidden border-b p-4 sm:p-7 lg:border-b-0 lg:border-r ${
+              className={`re-lattice-overlay relative flex flex-col justify-between overflow-hidden border-b p-4 sm:p-5 lg:border-b-0 lg:border-r ${
                 isLight
                   ? "border-slate-300/75 bg-[#d6dee9]/80"
                   : isBW
@@ -331,8 +508,8 @@ function Project({ theme = "dark" }) {
               }`}
             >
               {/* Top-Right Typewriter Index Bar: IMAGES 1 - (2) - 3 - 4 */}
-              <div className="relative z-40 mb-5 flex items-center justify-end gap-1.5 font-mono-tech text-xs tracking-[0.18em] theme-text-primary sm:text-sm">
-                <span className="mr-2 uppercase opacity-80">IMAGES</span>
+              <div className="relative z-40 mb-3 flex items-center justify-end gap-1 font-mono-tech text-xs tracking-[0.16em] theme-text-primary">
+                <span className="mr-1.5 uppercase opacity-80">IMAGES</span>
                 {projects.map((proj, idx) => {
                   const isActive = idx === currentIndex;
                   return (
@@ -342,7 +519,7 @@ function Project({ theme = "dark" }) {
                         onClick={() => handleSelectSlide(idx)}
                         onMouseEnter={() => soundEngine.playHover()}
                         aria-label={`Select project ${idx + 1}`}
-                        className={`relative inline-flex h-7 w-7 items-center justify-center font-mono-tech text-xs font-bold transition-colors ${
+                        className={`relative inline-flex h-6 w-6 items-center justify-center font-mono-tech text-xs font-bold transition-colors ${
                           isActive
                             ? "theme-text-primary"
                             : "theme-text-muted hover:theme-text-primary"
@@ -372,8 +549,8 @@ function Project({ theme = "dark" }) {
                 })}
               </div>
 
-              {/* 3D Stacked Photographic Prints Container */}
-              <div className="relative mx-auto my-auto aspect-[16/10] w-full max-w-[92%] sm:max-w-[88%]">
+              {/* Smaller 3D Stacked Photographic Prints Container */}
+              <div className="relative mx-auto my-auto aspect-[16/9] w-full max-w-[82%]">
                 {projects.map((proj, idx) => {
                   const depth = (idx - currentIndex + total) % total;
                   const isFront = depth === 0;
@@ -381,28 +558,27 @@ function Project({ theme = "dark" }) {
                   const isThird = depth === 2;
                   const isVisible = depth <= 2;
 
-                  // Physical stack offsets matching the Resident Evil Requiem screenshot
                   const stackX = isFront
                     ? 0
                     : isSecond
-                    ? 18
+                    ? 14
                     : isThird
-                    ? 34
-                    : 46;
+                    ? 26
+                    : 36;
                   const stackY = isFront
                     ? 0
                     : isSecond
-                    ? -14
+                    ? -11
                     : isThird
-                    ? -26
-                    : -36;
+                    ? -20
+                    : -28;
                   const stackRotate = isFront
                     ? 0
                     : isSecond
-                    ? 1.35
+                    ? 1.25
                     : isThird
-                    ? 2.45
-                    : 3.2;
+                    ? 2.2
+                    : 3.0;
                   const stackScale = isFront
                     ? 1
                     : isSecond
@@ -454,15 +630,15 @@ function Project({ theme = "dark" }) {
                       className={`group absolute inset-0 cursor-pointer overflow-hidden transition-[filter,border-color] duration-500 ${
                         isLight
                           ? isFront
-                            ? "border-[3px] border-slate-400/90 bg-slate-200 shadow-[0_18px_45px_rgba(15,23,42,0.18)] brightness-100"
+                            ? "border-[2.5px] border-slate-400/90 bg-slate-200 shadow-[0_14px_35px_rgba(15,23,42,0.16)] brightness-100"
                             : isSecond
-                            ? "border-[2px] border-slate-400/70 bg-slate-300 shadow-[0_12px_30px_rgba(15,23,42,0.14)] brightness-[0.82] hover:brightness-95"
-                            : "border-[2px] border-slate-400/50 bg-slate-300 shadow-[0_8px_20px_rgba(15,23,42,0.1)] brightness-[0.68] hover:brightness-85"
+                            ? "border-[2px] border-slate-400/70 bg-slate-300 shadow-[0_10px_24px_rgba(15,23,42,0.12)] brightness-[0.82] hover:brightness-95"
+                            : "border-[2px] border-slate-400/50 bg-slate-300 shadow-[0_6px_16px_rgba(15,23,42,0.1)] brightness-[0.68] hover:brightness-85"
                           : isFront
-                          ? "border-[3px] border-[#b7bec6] bg-[#14171d] shadow-[0_26px_70px_rgba(0,0,0,0.9)] brightness-100"
+                          ? "border-[2.5px] border-[#b7bec6] bg-[#14171d] shadow-[0_20px_50px_rgba(0,0,0,0.85)] brightness-100"
                           : isSecond
-                          ? "border-[2px] border-[#8b939c] bg-[#14171d] shadow-[0_18px_45px_rgba(0,0,0,0.75)] brightness-[0.58] hover:brightness-[0.78]"
-                          : "border-[2px] border-[#666e76] bg-[#14171d] shadow-[0_12px_30px_rgba(0,0,0,0.65)] brightness-[0.38] hover:brightness-[0.6]"
+                          ? "border-[2px] border-[#8b939c] bg-[#14171d] shadow-[0_14px_35px_rgba(0,0,0,0.7)] brightness-[0.58] hover:brightness-[0.78]"
+                          : "border-[2px] border-[#666e76] bg-[#14171d] shadow-[0_10px_25px_rgba(0,0,0,0.6)] brightness-[0.38] hover:brightness-[0.6]"
                       }`}
                     >
                       <img
@@ -474,7 +650,6 @@ function Project({ theme = "dark" }) {
                         }`}
                       />
 
-                      {/* Subtle Film Vignette Overlay */}
                       <div
                         className={`pointer-events-none absolute inset-0 bg-gradient-to-t ${
                           isLight
@@ -483,12 +658,11 @@ function Project({ theme = "dark" }) {
                         }`}
                       />
 
-                      {/* Front Card Badges */}
                       {isFront && (
                         <>
-                          <div className="absolute left-3 right-3 top-3 flex items-center justify-between gap-2">
+                          <div className="absolute left-2.5 right-2.5 top-2.5 flex items-center justify-between gap-2">
                             <span
-                              className={`border px-2.5 py-1 font-mono-tech text-[10px] font-bold uppercase tracking-wider backdrop-blur-md sm:text-[11px] ${
+                              className={`border px-2 py-0.5 font-mono-tech text-[10px] font-bold uppercase tracking-wider backdrop-blur-md ${
                                 isLight
                                   ? "border-slate-300/80 bg-[#dfe6f0]/90 text-slate-900 shadow-sm"
                                   : "border-white/25 bg-black/80 text-[#ece9e2]"
@@ -497,7 +671,7 @@ function Project({ theme = "dark" }) {
                               {proj.category || "FULL-STACK"}
                             </span>
                             <span
-                              className={`border px-3 py-1 font-mono-tech text-[10px] font-bold uppercase tracking-wider backdrop-blur-md transition sm:text-[11px] ${
+                              className={`border px-2.5 py-0.5 font-mono-tech text-[10px] font-bold uppercase tracking-wider backdrop-blur-md transition ${
                                 isLight
                                   ? "border-slate-300/85 bg-[#dfe6f0]/90 text-slate-900 shadow-sm group-hover:border-blue-600 group-hover:bg-blue-600 group-hover:text-white"
                                   : isBW
@@ -509,7 +683,7 @@ function Project({ theme = "dark" }) {
                             </span>
                           </div>
 
-                          <div className="pointer-events-none absolute bottom-3 left-3 right-3 flex items-center justify-between font-mono-tech text-[10px] uppercase tracking-[0.18em] text-white drop-shadow">
+                          <div className="pointer-events-none absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between font-mono-tech text-[9px] uppercase tracking-[0.16em] text-white drop-shadow">
                             <span>ARCHIVE PRINT #{idx + 1}</span>
                             <span>STACK DECK {"//"} {total} FILES</span>
                           </div>
@@ -521,20 +695,20 @@ function Project({ theme = "dark" }) {
               </div>
             </div>
 
-            {/* Right Side: Active Project Spotlight Dossier with Smooth Switch Transition */}
-            <div className="flex flex-col justify-between p-6 sm:p-7">
+            {/* Right Side: Compact Active Project Spotlight Dossier */}
+            <div className="flex flex-col justify-between p-5">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeProject._id || activeProject.title}
-                  initial={{ opacity: 0, y: 18, x: 14, skewX: -2 }}
+                  initial={{ opacity: 0, y: 14, x: 10, skewX: -2 }}
                   animate={{
                     opacity: [0, 0.85, 0.45, 1],
-                    y: [18, -2, 1, 0],
-                    x: [14, -3, 2, 0],
+                    y: [14, -2, 1, 0],
+                    x: [10, -2, 1, 0],
                     skewX: [-2, 2, -1, 0],
                   }}
-                  exit={{ opacity: 0, y: -14, x: -12 }}
-                  transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
+                  exit={{ opacity: 0, y: -10, x: -10 }}
+                  transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <div className="flex items-center justify-between font-mono-tech text-xs font-bold uppercase tracking-widest">
                     <span className="theme-accent-text">
@@ -545,23 +719,23 @@ function Project({ theme = "dark" }) {
                     </span>
                   </div>
 
-                  <h3 className="mt-2 font-requiem text-2xl font-bold uppercase tracking-wide theme-text-primary sm:text-3xl">
+                  <h3 className="mt-1.5 font-requiem text-xl font-bold uppercase tracking-wide theme-text-primary sm:text-2xl">
                     {activeProject.title}
                   </h3>
 
-                  <p className="mt-3 text-sm leading-relaxed theme-text-secondary sm:text-base">
+                  <p className="mt-2 text-xs leading-relaxed theme-text-secondary sm:text-sm">
                     {activeProject.description}
                   </p>
 
-                  <div className="mt-5">
-                    <div className="font-mono-tech text-[11px] font-bold uppercase tracking-wider theme-text-muted">
+                  <div className="mt-3.5">
+                    <div className="font-mono-tech text-[10px] font-bold uppercase tracking-wider theme-text-muted">
                       TECH STACK &amp; ARCHITECTURE:
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {techList.map((tech) => (
                         <span
                           key={tech}
-                          className="theme-badge rounded-md px-2.5 py-1 font-mono-tech text-xs font-semibold uppercase"
+                          className="theme-badge rounded-md px-2 py-0.5 font-mono-tech text-[11px] font-semibold uppercase"
                         >
                           {tech}
                         </span>
@@ -571,9 +745,9 @@ function Project({ theme = "dark" }) {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Clean Unified Action Buttons */}
+              {/* Compact Unified Action Buttons */}
               <div
-                className="mt-6 flex flex-wrap items-center gap-3 border-t pt-4"
+                className="mt-4 flex flex-wrap items-center gap-2 border-t pt-3.5"
                 style={{ borderColor: "var(--border-color)" }}
               >
                 <button
@@ -582,9 +756,9 @@ function Project({ theme = "dark" }) {
                     handleOpenExamine(activeProject, previewCardRef.current)
                   }
                   onMouseEnter={() => soundEngine.playHover()}
-                  className="re-requiem-btn group"
+                  className="re-requiem-btn group px-3.5 py-2 text-xs"
                 >
-                  <span>Examine File in 3D</span>
+                  <span>Examine 3D</span>
                   <span className="transition-transform duration-200 group-hover:translate-x-0.5">
                     →
                   </span>
@@ -596,7 +770,7 @@ function Project({ theme = "dark" }) {
                   rel="noreferrer"
                   onClick={() => soundEngine.playClick()}
                   onMouseEnter={() => soundEngine.playHover()}
-                  className="re-requiem-btn group"
+                  className="re-requiem-btn group px-3.5 py-2 text-xs"
                 >
                   <span>Live Demo</span>
                   <span className="transition-transform duration-200 group-hover:translate-x-0.5">
@@ -611,7 +785,7 @@ function Project({ theme = "dark" }) {
                     rel="noreferrer"
                     onClick={() => soundEngine.playClick()}
                     onMouseEnter={() => soundEngine.playHover()}
-                    className="re-requiem-btn group"
+                    className="re-requiem-btn group px-3.5 py-2 text-xs"
                   >
                     <span>GitHub</span>
                     <span className="transition-transform duration-200 group-hover:translate-x-0.5">
@@ -624,45 +798,6 @@ function Project({ theme = "dark" }) {
           </div>
         </motion.div>
       )}
-
-      {/* Bottom Character-Style Roster / Slide Selector Strip */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {projects.map((proj, idx) => {
-          const isCurrent = idx === currentIndex;
-          return (
-            <motion.button
-              key={proj._id || proj.title}
-              type="button"
-              variants={sysErrorCard}
-              custom={idx * 0.09}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              onClick={() => handleSelectSlide(idx)}
-              onMouseEnter={() => soundEngine.playHover()}
-              className={`theme-surface group flex items-center gap-3 overflow-hidden rounded-xl p-2 text-left transition-all ${
-                isCurrent
-                  ? "ring-2 ring-[var(--accent)]"
-                  : "opacity-75 hover:opacity-100"
-              }`}
-            >
-              <img
-                src={proj.image}
-                alt={proj.title}
-                className="h-12 w-16 shrink-0 rounded-lg object-cover"
-              />
-              <div className="min-w-0 flex-1">
-                <div className="font-mono-tech text-[10px] font-bold uppercase theme-accent-text">
-                  0{idx + 1} {"//"} {proj.category || "PROJECT"}
-                </div>
-                <div className="truncate font-requiem text-xs font-bold theme-text-primary sm:text-sm">
-                  {proj.title}
-                </div>
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
 
       {/* Smooth Origin-to-Center 3D Mouse Examination Stage */}
       {inspectedProject && (
