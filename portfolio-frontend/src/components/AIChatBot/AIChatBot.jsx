@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { PostMessage } from "../../service/APIChatBot";
 import { getSummary } from "../../service/resume.api";
+import { soundEngine } from "../../utils/soundEngine";
 
 function AIChatBot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,7 @@ function AIChatBot() {
 
   const sendMessage = async () => {
     if (!message.trim()) return;
+    soundEngine.playClick();
 
     const userMessage = message;
 
@@ -47,12 +49,13 @@ function AIChatBot() {
             text: "The AI is tired of working for free. Please try again later 😒",
           },
         ]);
+        setLoading(false);
         return;
       }
 
       setChat((prev) => [
         ...prev,
-        { sender: "bot", text: "Something went wrong. Please try again." },
+        { sender: "bot", text: "Transmission interrupted. Please try again." },
       ]);
     }
 
@@ -77,78 +80,100 @@ function AIChatBot() {
   }, []);
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] max-sm:bottom-4 max-sm:right-4">
+    <div className="fixed bottom-5 right-4 z-[9000] sm:right-6">
       {isOpen && (
         <section
-          className="absolute bottom-[82px] right-0 flex h-[min(520px,calc(100vh-128px))] w-[min(360px,calc(100vw-32px))] flex-col overflow-hidden rounded-lg border border-amber-400/45 bg-stone-100 text-neutral-900 shadow-[0_24px_70px_rgba(0,0,0,0.42)] max-sm:bottom-[74px] max-sm:h-[min(500px,calc(100vh-106px))]"
-          aria-label="AI Portfolio Bot"
+          className="theme-surface absolute bottom-[64px] right-0 flex h-[min(480px,calc(100vh-130px))] w-[min(360px,calc(100vw-32px))] flex-col overflow-hidden rounded-2xl backdrop-blur-xl"
+          style={{ borderColor: "var(--border-strong)" }}
+          aria-label="Red Queen AI Portfolio Assistant"
         >
-          <div className="flex items-center justify-between gap-3 bg-neutral-900 p-3.5 text-white">
+          <div
+            className="flex items-center justify-between gap-3 border-b p-3.5"
+            style={{
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--bg-input)",
+            }}
+          >
             <div className="flex min-w-0 items-center gap-2.5">
               <span
-                className="inline-flex h-[30px] w-9 flex-none items-center justify-center gap-1.5 rounded-[10px] border-2 border-white bg-amber-400"
+                className="theme-badge inline-flex h-8 w-8 flex-none items-center justify-center rounded-lg font-mono-tech text-xs font-bold"
                 aria-hidden="true"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-neutral-900"></span>
-                <span className="h-1.5 w-1.5 rounded-full bg-neutral-900"></span>
+                AI
               </span>
               <div>
-                <h2 className="text-base leading-tight">AI Portfolio Bot</h2>
-                <p className="mt-0.5 text-xs leading-snug text-stone-300">
-                  Ask about Himanshu&apos;s skills and projects
+                <h2 className="font-requiem text-sm font-bold uppercase tracking-[0.12em] theme-text-primary">
+                  RED QUEEN {"//"} AI TERMINAL
+                </h2>
+                <p className="font-mono-tech text-[10px] uppercase tracking-[0.15em] theme-text-muted">
+                  QUERY OPERATIVE SKILLS &amp; PROJECTS
                 </p>
               </div>
             </div>
 
             <button
               type="button"
-              className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full border border-white/25 bg-transparent text-lg leading-none text-white"
-              onClick={() => setIsOpen(false)}
+              className="theme-badge inline-flex h-7 w-7 items-center justify-center rounded-lg font-mono-tech text-xs font-bold transition hover:opacity-80"
+              onClick={() => {
+                soundEngine.playClick();
+                setIsOpen(false);
+              }}
               aria-label="Close chatbot"
             >
-              x
+              X
             </button>
           </div>
 
-          <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-3.5">
+          <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto p-3.5 font-mono-tech text-xs">
             {chat.length === 0 && (
-              <div className="self-start text-sm text-neutral-500">
-                Hi, I can help you explore this portfolio.
+              <div className="theme-badge self-start rounded-xl p-3">
+                [RED QUEEN ONLINE]: Greetings. Query me regarding Himanshu&apos;s
+                engineering stack, experience, or case files.
               </div>
             )}
 
             {chat.map((msg, index) => (
               <div
                 key={index}
-                className={`max-w-[82%] whitespace-pre-wrap rounded-lg px-3 py-2.5 text-sm leading-[1.45] ${
+                className={`max-w-[85%] whitespace-pre-wrap rounded-xl px-3 py-2.5 leading-relaxed ${
                   msg.sender === "user"
-                    ? "self-end bg-amber-400 text-neutral-900"
-                    : "self-start bg-neutral-200 text-neutral-900"
+                    ? "theme-accent-bg self-end"
+                    : "theme-input self-start"
                 }`}
               >
                 {msg.text}
               </div>
             ))}
 
-            {loading && <div className="self-start text-sm text-neutral-500">Typing...</div>}
+            {loading && (
+              <div className="self-start font-mono-tech text-xs theme-accent-text">
+                DECRYPTING RESPONSE...
+              </div>
+            )}
           </div>
 
-          <div className="flex gap-2 border-t border-neutral-300 bg-white p-3">
+          <div
+            className="flex gap-2 border-t p-3"
+            style={{
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--bg-input)",
+            }}
+          >
             <input
-              className="min-w-0 flex-1 rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none transition focus:border-amber-400 focus:ring-4 focus:ring-amber-400/20"
+              className="theme-input min-w-0 flex-1 rounded-lg px-3 py-2 font-mono-tech text-xs outline-none transition"
               type="text"
-              placeholder="Ask about me..."
+              placeholder="TRANSMIT QUERY..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
 
             <button
-              className="rounded-lg bg-neutral-900 px-3.5 font-semibold text-white"
+              className="re-requiem-btn px-3.5 py-2 text-xs"
               type="button"
               onClick={sendMessage}
             >
-              Send
+              SEND
             </button>
           </div>
         </section>
@@ -156,25 +181,19 @@ function AIChatBot() {
 
       <button
         type="button"
-        className={`inline-flex h-16 w-16 items-center justify-center rounded-full border-0 shadow-[0_18px_40px_rgba(0,0,0,0.35)] transition hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(0,0,0,0.45)] max-sm:h-[58px] max-sm:w-[58px] ${
-          isOpen
-            ? "bg-gradient-to-br from-neutral-800 to-neutral-500"
-            : "bg-gradient-to-br from-amber-400 to-cyan-400"
-        }`}
-        onClick={() => setIsOpen((prev) => !prev)}
+        className="re-requiem-btn h-12 rounded-xl px-4 text-xs shadow-lg"
+        onClick={() => {
+          soundEngine.playClick();
+          setIsOpen((prev) => !prev);
+        }}
         aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
         aria-expanded={isOpen}
       >
         <span
-          className="relative flex h-7 w-[34px] items-center justify-center gap-[7px] rounded-xl border-[3px] border-neutral-900 bg-white"
-          aria-hidden="true"
-        >
-          <span className="absolute -top-[10px] h-[9px] w-[3px] bg-neutral-900"></span>
-          <span className="absolute -top-[15px] h-[9px] w-[9px] rounded-full bg-neutral-900"></span>
-          <span className="h-1.5 w-1.5 rounded-full bg-neutral-900"></span>
-          <span className="h-1.5 w-1.5 rounded-full bg-neutral-900"></span>
-          <span className="absolute bottom-[5px] h-[3px] w-[14px] rounded-full bg-amber-400"></span>
-        </span>
+          className="h-2 w-2 animate-ping rounded-full"
+          style={{ backgroundColor: "var(--accent)" }}
+        />
+        <span>{isOpen ? "CLOSE AI" : "AI COMMS"}</span>
       </button>
     </div>
   );

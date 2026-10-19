@@ -1,63 +1,135 @@
-import React from "react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { soundEngine } from "../utils/soundEngine";
+import { sysErrorCard, sysErrorFadeUp } from "../utils/motionVariants";
 
 const socialLinks = [
   {
-    label: "GitHub",
-    href: "https://github.com/Himanshu-Mandowra"
+    label: "GitHub Repository",
+    code: "GH",
+    href: "https://github.com/Himanshu-Mandowra",
   },
   {
-    label: "LinkedIn",
-    href: "http://www.linkedin.com/in/himanshu-mandowra"
+    label: "LinkedIn Profile",
+    code: "IN",
+    href: "http://www.linkedin.com/in/himanshu-mandowra",
   },
   {
-    label: "Twitter",
-    href: "https://x.com/Himshu_Mandowra"
-  }
+    label: "X (Twitter)",
+    code: "TW",
+    href: "https://x.com/Himshu_Mandowra",
+  },
 ];
 
 function Contact() {
+  const [copied, setCopied] = useState(false);
+  const email = "himanshu.mandowra1234@gmail.com";
+
+  const handleCopyEmail = () => {
+    soundEngine.playClick();
+    navigator.clipboard?.writeText(email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
   return (
-    <section className="mx-auto w-full max-w-6xl py-12 md:py-16" id="contact">
-      <div className="mb-7">
-        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400/10 px-4 py-2 text-sm uppercase tracking-[0.05em] text-amber-400">
-          Contact
-        </div>
-        <h2 className="mt-4 max-w-3xl font-['Arsenal_SC'] text-4xl leading-tight text-[#f6f1e8] md:text-5xl">
-          Let&apos;s build something clean, useful, and memorable.
+    <section className="mx-auto w-full max-w-7xl py-10 md:py-12" id="contact">
+      <motion.div
+        variants={sysErrorFadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+        className="mb-6"
+      >
+        <span className="theme-badge inline-flex rounded-full px-3 py-1 font-mono-tech text-xs font-bold uppercase tracking-[0.18em]">
+          06 {"//"} DIRECT COMMUNICATION
+        </span>
+        <h2 className="mt-2 font-requiem text-2xl font-bold uppercase tracking-[0.06em] theme-text-primary sm:text-4xl">
+          LET&apos;S <span className="theme-accent-text">CONNECT</span>
         </h2>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-6 rounded-[28px] border border-white/10 bg-neutral-900/90 p-7 shadow-[0_24px_80px_rgba(0,0,0,0.28)] md:grid-cols-[1.2fr_0.8fr]">
+      <motion.div
+        variants={sysErrorCard}
+        custom={0.08}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="theme-surface grid gap-6 rounded-2xl p-6 sm:p-8 lg:grid-cols-[1.25fr_0.75fr]"
+      >
         <div>
-          <h3 className="mb-2 text-xl font-semibold text-[#f6f1e8]">
-            Open to freelance work, collaborations, and product builds.
+          <div className="inline-flex items-center gap-2 font-mono-tech text-xs font-bold uppercase tracking-wider text-emerald-500">
+            <span className="h-2 w-2 animate-ping rounded-full bg-emerald-500" />
+            <span>AVAILABLE FOR FULL-STACK ROLES &amp; FREELANCE PROJECTS</span>
+          </div>
+
+          <h3 className="mt-2.5 font-requiem text-xl font-bold uppercase theme-text-primary sm:text-2xl">
+            Ready to build clean, scalable, and memorable web applications.
           </h3>
-          <p className="leading-7 text-stone-400">
-            If you want a modern site, a frontend refresh, or a simple backend
-            integration, I can help turn it into a polished result.
+
+          <p className="mt-2.5 text-sm leading-relaxed theme-text-secondary sm:text-base">
+            Have a full-stack role, frontend upgrade, or backend API integration
+            in mind? Reach out directly via email or social channels.
           </p>
-          <a
-            className="mt-5 inline-flex w-fit items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-[#f6f1e8] transition hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-amber-400/10"
-            href="mailto:himanshu.mandowra1234@gmail.com"
-          >
-            himanshu.mandowra1234@gmail.com
-          </a>
+
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <a
+              href={`mailto:${email}`}
+              onClick={() => soundEngine.playClick()}
+              onMouseEnter={() => soundEngine.playHover()}
+              className="re-requiem-btn group"
+            >
+              <span>Send Email</span>
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                →
+              </span>
+            </a>
+
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              onMouseEnter={() => soundEngine.playHover()}
+              className="re-requiem-btn group"
+            >
+              <span>{copied ? "✓ Email Copied!" : email}</span>
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                →
+              </span>
+            </button>
+          </div>
         </div>
 
-        <div className="grid content-start gap-3">
-          {socialLinks.map((item) => (
-            <a
+        <div className="grid content-center gap-2.5">
+          {socialLinks.map((item, idx) => (
+            <motion.a
               key={item.label}
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-[#f6f1e8] transition hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-amber-400/10"
+              variants={sysErrorCard}
+              custom={0.14 + idx * 0.08}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
               href={item.href}
               target="_blank"
               rel="noreferrer"
+              onMouseEnter={() => soundEngine.playHover()}
+              className="theme-surface flex items-center justify-between rounded-xl px-4 py-3 font-mono-tech text-xs font-bold uppercase tracking-wider transition hover:-translate-y-0.5"
             >
-              {item.label}
-            </a>
+              <span>{item.label}</span>
+              <span className="theme-accent-text">[{item.code} ↗]</span>
+            </motion.a>
           ))}
         </div>
-      </div>
+      </motion.div>
+
+      <footer
+        className="mt-10 flex flex-col items-center justify-between gap-3 border-t pt-5 font-mono-tech text-xs uppercase tracking-wider theme-text-muted sm:flex-row"
+        style={{ borderColor: "var(--border-color)" }}
+      >
+        <div>© {new Date().getFullYear()} HIMANSHU MANDOWRA</div>
+        <div>
+          REQUIEM EDITION {"//"} DARK • LIGHT • B&amp;W MODES
+        </div>
+      </footer>
     </section>
   );
 }

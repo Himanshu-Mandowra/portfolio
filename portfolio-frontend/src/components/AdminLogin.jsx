@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { requestAdminOtp, verifyAdminOtp } from "../service/admin.api";
 import { saveAdminSession } from "../utils/adminSession";
+import { UmbrellaOctagonSVG } from "./RequiemLoader";
+import { soundEngine } from "../utils/soundEngine";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -9,7 +11,7 @@ function AdminLogin() {
   const [form, setForm] = useState({
     email: "",
     password: "",
-    otp: ""
+    otp: "",
   });
   const [requestId, setRequestId] = useState("");
   const [message, setMessage] = useState("");
@@ -19,11 +21,13 @@ function AdminLogin() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+    soundEngine.playTypewriter();
     setForm((current) => ({ ...current, [name]: value }));
   };
 
   const handleRequestOtp = async (event) => {
     event.preventDefault();
+    soundEngine.playClick();
     setIsSubmitting(true);
     setError("");
     setMessage("");
@@ -31,16 +35,17 @@ function AdminLogin() {
     try {
       const data = await requestAdminOtp({
         email: form.email,
-        password: form.password
+        password: form.password,
       });
 
       setRequestId(data.requestId);
       setDevOtp(data.devOtp || "");
-      setMessage(data.message || "OTP sent to your email.");
+      setMessage(data.message || "ENCRYPTED OTP TRANSMITTED TO OPERATIVE EMAIL.");
       setStep("otp");
     } catch (requestError) {
       setError(
-        requestError.response?.data?.message || "Unable to send OTP right now."
+        requestError.response?.data?.message ||
+          "ACCESS DENIED // Unable to transmit OTP right now."
       );
     } finally {
       setIsSubmitting(false);
@@ -49,6 +54,7 @@ function AdminLogin() {
 
   const handleVerifyOtp = async (event) => {
     event.preventDefault();
+    soundEngine.playClick();
     setIsSubmitting(true);
     setError("");
 
@@ -56,14 +62,15 @@ function AdminLogin() {
       const data = await verifyAdminOtp({
         email: form.email,
         requestId,
-        otp: form.otp
+        otp: form.otp,
       });
 
       saveAdminSession(data.token, data.expiresAt);
       navigate("/admin/projects", { replace: true });
     } catch (verifyError) {
       setError(
-        verifyError.response?.data?.message || "OTP verification failed."
+        verifyError.response?.data?.message ||
+          "BIOMETRIC OTP VERIFICATION FAILED."
       );
     } finally {
       setIsSubmitting(false);
@@ -71,98 +78,152 @@ function AdminLogin() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-6 sm:px-6">
-      <div className="w-full max-w-xl rounded-[28px] border border-white/10 bg-neutral-900/90 p-7 shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
-        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400/10 px-4 py-2 text-sm uppercase tracking-[0.05em] text-amber-400">
-          Admin
+    <div className="relative flex min-h-screen items-center justify-center bg-[#050508] px-4 py-10 text-[#ece7df] sm:px-6">
+      <div className="re-lattice-overlay pointer-events-none fixed inset-0 opacity-50" />
+      <div className="re-vignette pointer-events-none fixed inset-0" />
+
+      <div className="re-clip-card relative z-10 w-full max-w-xl border border-red-700/60 bg-[#09090e]/95 p-7 shadow-[0_0_90px_rgba(220,38,38,0.22)] sm:p-9">
+        {/* Top Header */}
+        <div className="flex items-center justify-between border-b border-red-900/40 pb-5">
+          <div className="flex items-center gap-3.5">
+            <UmbrellaOctagonSVG className="h-12 w-12 shrink-0" spin />
+            <div>
+              <div className="font-mono-tech text-xs uppercase tracking-[0.24em] text-red-500">
+                UMBRELLA CORPORATION // BIO-TERMINAL
+              </div>
+              <h1 className="mt-1 font-requiem text-2xl font-bold uppercase tracking-[0.1em] text-white sm:text-3xl">
+                {step === "credentials"
+                  ? "RESTRICTED ACCESS"
+                  : "VERIFY CLEARANCE CODE"}
+              </h1>
+            </div>
+          </div>
         </div>
-        <h1 className="mt-4 font-['Arsenal_SC'] text-4xl leading-tight text-[#f6f1e8]">
-          {step === "credentials" ? "Secure Sign In" : "Verify OTP"}
-        </h1>
-        <p className="mt-4 leading-7 text-stone-400">
-          Manage project cards with a simple protected flow using your password
-          and email OTP.
+
+        <p className="mt-4 font-mono-tech text-xs uppercase leading-6 tracking-[0.15em] text-stone-400">
+          AUTHORIZED PERSONNEL ONLY. AUTHENTICATE VIA MASTER CREDENTIALS AND
+          SECONDARY OTP VERIFICATION TO MODIFY ARCHIVE CASE FILES.
         </p>
 
         {step === "credentials" ? (
-          <form className="mt-6 grid gap-3" onSubmit={handleRequestOtp}>
-            <label className="text-sm text-stone-300" htmlFor="email">Admin email</label>
-            <input
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-[#f6f1e8] outline-none transition placeholder:text-stone-500 focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20"
-              id="email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              required
-            />
+          <form className="mt-6 grid gap-4" onSubmit={handleRequestOtp}>
+            <div>
+              <label
+                className="block font-mono-tech text-xs uppercase tracking-[0.2em] text-stone-300"
+                htmlFor="email"
+              >
+                OPERATIVE EMAIL ID
+              </label>
+              <input
+                className="mt-1.5 w-full border border-white/15 bg-black/80 px-4 py-3 font-mono-tech text-sm text-[#ece7df] outline-none transition placeholder:text-stone-600 focus:border-red-500"
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="operative@umbrella-corp.com"
+                required
+              />
+            </div>
 
-            <label className="text-sm text-stone-300" htmlFor="password">Password</label>
-            <input
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-[#f6f1e8] outline-none transition placeholder:text-stone-500 focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20"
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Enter admin password"
-              required
-            />
+            <div>
+              <label
+                className="block font-mono-tech text-xs uppercase tracking-[0.2em] text-stone-300"
+                htmlFor="password"
+              >
+                SECURITY PASSKEY
+              </label>
+              <input
+                className="mt-1.5 w-full border border-white/15 bg-black/80 px-4 py-3 font-mono-tech text-sm text-[#ece7df] outline-none transition placeholder:text-stone-600 focus:border-red-500"
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="••••••••••••"
+                required
+              />
+            </div>
 
             <button
-              className="mt-2 inline-flex items-center justify-center rounded-2xl border border-amber-400 bg-amber-400 px-4 py-3 font-semibold text-neutral-950 transition hover:-translate-y-0.5 hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-70"
+              className="re-clip-btn mt-2 inline-flex items-center justify-center border border-red-500 bg-red-600 px-5 py-3.5 font-mono-tech text-xs font-bold uppercase tracking-[0.22em] text-white shadow-[0_0_25px_rgba(220,38,38,0.4)] transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60"
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Sending..." : "Send OTP"}
+              {isSubmitting
+                ? "TRANSMITTING..."
+                : "REQUEST SECURITY OTP [STAGE 1]"}
             </button>
           </form>
         ) : (
-          <form className="mt-6 grid gap-3" onSubmit={handleVerifyOtp}>
-            <label className="text-sm text-stone-300" htmlFor="otp">Email OTP</label>
-            <input
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-[#f6f1e8] outline-none transition placeholder:text-stone-500 focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/20"
-              id="otp"
-              name="otp"
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              value={form.otp}
-              onChange={handleChange}
-              placeholder="6 digit code"
-              required
-            />
+          <form className="mt-6 grid gap-4" onSubmit={handleVerifyOtp}>
+            <div>
+              <label
+                className="block font-mono-tech text-xs uppercase tracking-[0.2em] text-stone-300"
+                htmlFor="otp"
+              >
+                6-DIGIT TRANSMISSION CODE (OTP)
+              </label>
+              <input
+                className="mt-1.5 w-full border border-red-500/60 bg-black/80 px-4 py-3 text-center font-mono-tech text-xl tracking-[0.4em] text-white outline-none transition focus:border-red-500"
+                id="otp"
+                name="otp"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={form.otp}
+                onChange={handleChange}
+                placeholder="000000"
+                required
+              />
+            </div>
 
-            <button
-              className="mt-2 inline-flex items-center justify-center rounded-2xl border border-amber-400 bg-amber-400 px-4 py-3 font-semibold text-neutral-950 transition hover:-translate-y-0.5 hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-70"
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Verifying..." : "Verify and continue"}
-            </button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                className="re-clip-btn flex-1 border border-red-500 bg-red-600 px-5 py-3.5 font-mono-tech text-xs font-bold uppercase tracking-[0.22em] text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "DECRYPTING..." : "VERIFY & UNLOCK MAINFRAME"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep("credentials")}
+                className="re-clip-btn border border-white/20 bg-white/5 px-4 py-3.5 font-mono-tech text-xs uppercase tracking-[0.18em] text-stone-300 hover:text-white"
+              >
+                BACK
+              </button>
+            </div>
           </form>
         )}
 
-        {message ? (
-          <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
-            {message}
+        {message && (
+          <div className="mt-4 border border-emerald-500/40 bg-emerald-950/30 px-4 py-3 font-mono-tech text-xs tracking-wider text-emerald-300">
+            [SYSTEM]: {message}
           </div>
-        ) : null}
-        {error ? (
-          <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-200">
-            {error}
+        )}
+        {error && (
+          <div className="mt-4 border border-red-500/50 bg-red-950/40 px-4 py-3 font-mono-tech text-xs tracking-wider text-red-300">
+            [ALERT]: {error}
           </div>
-        ) : null}
-        {devOtp ? (
-          <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">
-            Dev OTP fallback: <strong>{devOtp}</strong>
+        )}
+        {devOtp && (
+          <div className="mt-4 border border-amber-500/40 bg-amber-950/30 px-4 py-3 font-mono-tech text-xs tracking-wider text-amber-200">
+            DEV CLEARANCE OTP FALLBACK:{" "}
+            <strong className="text-sm text-white">{devOtp}</strong>
           </div>
-        ) : null}
+        )}
 
-        <Link className="mt-5 inline-flex text-sm font-medium text-amber-400 transition hover:text-amber-300" to="/">
-          Back to portfolio
-        </Link>
+        <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4 font-mono-tech text-xs uppercase tracking-[0.18em]">
+          <Link
+            className="inline-flex items-center gap-2 text-red-400 transition hover:text-red-300"
+            to="/"
+            onClick={() => soundEngine.playClick()}
+          >
+            <span>← EXIT TO PUBLIC PORTFOLIO SECTOR</span>
+          </Link>
+          <span className="text-stone-600">UMBRELLA OS v4.2</span>
+        </div>
       </div>
     </div>
   );

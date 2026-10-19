@@ -4,15 +4,47 @@
     "title": "Discord Tool Bot",
     "description": "A customizable Discord ticket system with private support channels, role-based staff management, configurable ticket panels, and automatic ticket transcripts.",
     "link": "https://gentle-bot.vercel.app/",
+    "codeLink": "https://github.com/Himanshu-Mandowra",
     "image": "https://res.cloudinary.com/dh7qnzsbb/image/upload/v1784472569/0a8d60af-c579-4676-b9a9-508f307202a0.png",
+    "category": "BOT / AUTOMATION",
+    "clearance": "LEVEL 5",
+    "techStack": ["Node.js", "Discord.js", "React", "MongoDB", "Express"],
     "createdAt": "2026-07-19T14:43:41.331Z"
   },
   {
-    "_id": "seed-project-1",
-    "title": "Portfolio Platform",
-    "description": "A personal portfolio with a clean dark theme, protected admin project management, and a structured frontend-backend flow.",
+    "_id": "seed-project-2",
+    "title": "Wellness Service Platform",
+    "description": "Full-stack booking and tele-consultation platform featuring real-time scheduling, role-based access control, secure authentication, and automated notifications.",
     "link": "https://github.com/Himanshu-Mandowra",
+    "codeLink": "https://github.com/Himanshu-Mandowra",
+    "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=900&q=80",
+    "category": "FULL-STACK",
+    "clearance": "OMEGA",
+    "techStack": ["Next.js", "TypeScript", "NestJS", "PostgreSQL", "Prisma"],
+    "createdAt": "2026-07-19T10:00:00.000Z"
+  },
+  {
+    "_id": "seed-project-3",
+    "title": "E-Commerce & Inventory Core",
+    "description": "High-throughput REST API and storefront architecture supporting multi-vendor inventory tracking, JWT security, payment webhooks, and analytics dashboards.",
+    "link": "https://github.com/Himanshu-Mandowra",
+    "codeLink": "https://github.com/Himanshu-Mandowra",
+    "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80",
+    "category": "BACKEND / API",
+    "clearance": "LEVEL 4",
+    "techStack": ["Node.js", "Express", "MongoDB", "Redis", "Tailwind CSS"],
+    "createdAt": "2026-07-19T05:00:00.000Z"
+  },
+  {
+    "_id": "seed-project-1",
+    "title": "Requiem Tactical Portfolio",
+    "description": "A survival-horror inspired developer dossier with interactive Three.js bio-particles, Umbrella security transitions, and a protected CRUD admin terminal with live image cropping.",
+    "link": "https://github.com/Himanshu-Mandowra",
+    "codeLink": "https://github.com/Himanshu-Mandowra",
     "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",
+    "category": "FRONTEND / 3D",
+    "clearance": "CLASSIFIED",
+    "techStack": ["React", "Three.js", "Tailwind CSS", "Express", "JWT"],
     "createdAt": "2026-07-19T00:00:00.000Z"
   }
 ]

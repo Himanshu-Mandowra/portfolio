@@ -14,3 +14,24 @@ export async function createProject(payload, token) {
 
   return response.data.data;
 }
+
+export async function updateProject(id, payload, token) {
+  const response = await authClient.put(`/projects/${id}`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data.data;
+}
+
+export async function deleteProject(id, token) {
+  const response = await authClient.delete(`/projects/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data.data;
+}
+

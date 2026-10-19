@@ -1,40 +1,128 @@
-@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;800&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Arsenal+SC:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Orbitron:wght@700;800;900&family=Rajdhani:wght@600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   3-MODE THEME SYSTEM
+   1: Dark Mode (High-Contrast Tactical Dark)
+   2: Light Mode (Soft Slate-Stone / Pearl — Less White, Zero Pink, Cobalt Accent)
+   3: B&W Mode (High-Contrast Monochrome)
+   ========================================================================== */
+:root,
+[data-theme="dark"] {
+  --bg-primary: #0f1218;
+  --bg-secondary: #171c26;
+  --bg-card: rgba(24, 30, 42, 0.92);
+  --bg-card-hover: rgba(31, 39, 54, 0.98);
+  --bg-nav: rgba(18, 22, 31, 0.92);
+  --bg-input: #0b0e14;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent: #ef4444;
+  --accent-hover: #dc2626;
+  --accent-soft: rgba(239, 68, 68, 0.14);
+  --accent-text: #fca5a5;
+  --border-color: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(239, 68, 68, 0.55);
+  --grid-line: rgba(255, 255, 255, 0.035);
+  --shadow-card: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] {
+  --bg-primary: #e4e9f0;
+  --bg-secondary: #d9e0ea;
+  --bg-card: rgba(233, 238, 245, 0.92);
+  --bg-card-hover: #edf1f7;
+  --bg-nav: rgba(229, 235, 243, 0.92);
+  --bg-input: #dce3ed;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #526277;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --accent-text: #1d4ed8;
+  --border-color: rgba(100, 116, 139, 0.28);
+  --border-strong: rgba(37, 99, 235, 0.48);
+  --grid-line: rgba(71, 85, 105, 0.065);
+  --shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="bw"] {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --bg-card: rgba(22, 22, 22, 0.95);
+  --bg-card-hover: rgba(32, 32, 32, 0.98);
+  --bg-nav: rgba(16, 16, 16, 0.94);
+  --bg-input: #050505;
+  --text-primary: #ffffff;
+  --text-secondary: #e5e5e5;
+  --text-muted: #a3a3a3;
+  --accent: #ffffff;
+  --accent-hover: #d4d4d4;
+  --accent-soft: rgba(255, 255, 255, 0.12);
+  --accent-text: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.24);
+  --border-strong: rgba(255, 255, 255, 0.85);
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --shadow-card: 0 18px 50px rgba(0, 0, 0, 0.7);
+}
+
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
   html {
     min-height: 100%;
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    background-color: var(--bg-primary);
   }
 
   body,
   #root {
     min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
   }
 
   body {
-    margin: 0;
     min-width: 320px;
-    background:
-      radial-gradient(circle at top right, rgba(255, 174, 0, 0.12), transparent 22%),
-      radial-gradient(circle at left center, rgba(255, 255, 255, 0.05), transparent 20%),
-      linear-gradient(180deg, #171717 0%, #111111 100%);
-    color: #f6f1e8;
-    font-family: "Rubik", sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  p {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+  }
+
+  [data-theme="light"] body {
+    background-image: linear-gradient(
+      180deg,
+      #e7ecf3 0%,
+      #e2e8f0 52%,
+      #dae1eb 100%
+    );
   }
 
   a,
   button,
   input,
-  textarea {
+  textarea,
+  select {
     font: inherit;
   }
 
@@ -43,64 +131,300 @@
   }
 }
 
-@layer components {
-  .hero-name-typed {
-    position: relative;
-    overflow: hidden;
-    white-space: nowrap;
-    -webkit-text-stroke: 0.12vw #3d4350;
-  }
-
-  .hero-name-typed::before {
-    content: attr(data-text);
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 0;
-    overflow: hidden;
-    color: #01fe87;
-    -webkit-text-stroke: 0 #01fe87;
-    border-right: 2px solid #01fe87;
-    animation: heroTypingFill 6s linear infinite;
-  }
-
-  .hero-image-frame::before {
-    content: "";
-    position: absolute;
-    inset: -24% 32%;
-    background: linear-gradient(180deg, #ffae00, #9dff00);
-    animation: heroSpin 1.5s linear infinite;
-  }
+/* Theme-Aware Utility Classes */
+.theme-surface {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  color: var(--text-primary);
+  transition: all 0.25s ease;
 }
 
-@keyframes heroTypingFill {
-  0%,
-  10%,
-  100% {
-    width: 0;
-  }
-
-  70%,
-  90% {
-    width: 100%;
-  }
+.theme-surface:hover {
+  border-color: var(--border-strong);
 }
 
-@keyframes heroSpin {
+.theme-nav {
+  background-color: var(--bg-nav);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  color: var(--text-primary);
+}
+
+.theme-text-primary {
+  color: var(--text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+.theme-accent-text {
+  color: var(--accent);
+}
+
+.theme-accent-bg {
+  background-color: var(--accent);
+  color: #ffffff;
+}
+[data-theme="bw"] .theme-accent-bg {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.theme-badge {
+  background-color: var(--accent-soft);
+  border: 1px solid var(--border-strong);
+  color: var(--accent-text);
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 600;
+}
+[data-theme="light"] .theme-badge {
+  color: var(--accent);
+}
+
+.theme-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.theme-input:focus {
+  border-color: var(--accent);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY SYSTEM
+   - HIMANSHU / MANDOWRA & Headings : Orbitron (700–900)
+   - Navigation & Buttons           : Rajdhani (600–700)
+   - Stats & Technical Labels       : Rajdhani (600)
+   - Description & Body Text        : Inter (400–500)
+   - Code-Style Tagline             : JetBrains Mono (400–500)
+   ========================================================================== */
+.font-requiem,
+.font-orbitron {
+  font-family: "Orbitron", sans-serif;
+  font-weight: 800;
+}
+
+.font-nav-btn {
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+}
+
+.font-mono-tech,
+.font-tech-label {
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 600;
+}
+
+.font-code-tagline {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+}
+
+.font-body-inter {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+}
+
+/* Subtle Grid Background */
+.re-lattice-overlay {
+  background-size: 48px 48px;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+}
+
+/* Portrait Biometric Laser Scan Animation */
+@keyframes bioScanline {
   0% {
-    transform: rotate(0deg);
+    top: 0%;
+    opacity: 0;
   }
-
+  20% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.85;
+  }
   100% {
-    transform: rotate(360deg);
+    top: 100%;
+    opacity: 0;
   }
 }
 
-@media (max-width: 700px) {
-  .hero-name-typed {
-    white-space: normal;
-  }
+.animate-bio-scan {
+  animation: bioScanline 4s ease-in-out infinite;
+}
 
-  .hero-name-typed::before {
-    display: none;
+/* Pipeline Flowing Pulse Animation */
+@keyframes pipelineFlow {
+  0% {
+    background-position: 0% 50%;
   }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.animate-pipeline {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: pipelineFlow 2.5s linear infinite;
+}
+
+/* ECG Waveform Pulse Animation */
+@keyframes ecgPulse {
+  0% {
+    stroke-dashoffset: 400;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-ecg {
+  stroke-dasharray: 400;
+  animation: ecgPulse 2.8s linear infinite;
+}
+
+/* ==========================================================================
+   3D HOLOGRAM PORTRAIT: ORIGINAL PHASE + PIXEL / LINE-BY-LINE HOLOGRAM MATRIX
+   ========================================================================== */
+@keyframes holoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes holoScanMove {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 96px, 0 0;
+  }
+}
+
+.holo-levitate {
+  animation: holoFloat 4.5s ease-in-out infinite;
+}
+
+/* Line-by-line horizontal holographic slices + fine pixel matrix grid */
+.holo-pixel-lines {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(6, 14, 24, 0.58) 2px,
+      rgba(6, 14, 24, 0.58) 4px
+    ),
+    radial-gradient(rgba(56, 189, 248, 0.22) 1px, transparent 1px);
+  background-size: 100% 4px, 4px 4px;
+  animation: holoScanMove 3.2s linear infinite;
+}
+
+[data-theme="light"] .holo-pixel-lines {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0px,
+      rgba(255, 255, 255, 0) 2px,
+      rgba(15, 23, 42, 0.28) 2px,
+      rgba(15, 23, 42, 0.28) 4px
+    ),
+    radial-gradient(rgba(37, 99, 235, 0.2) 1px, transparent 1px);
+  background-size: 100% 4px, 4px 4px;
+}
+
+[data-theme="bw"] .holo-pixel-lines {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.65) 2px,
+      rgba(0, 0, 0, 0.65) 4px
+    ),
+    radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+  background-size: 100% 4px, 4px 4px;
+}
+
+/* Preserves original photo depth without over-brightening */
+.holo-image-filter {
+  filter: contrast(1.08) brightness(0.92) saturate(0.92);
+}
+
+[data-theme="light"] .holo-image-filter {
+  filter: contrast(1.05) brightness(0.96) saturate(0.95);
+}
+
+[data-theme="bw"] .holo-image-filter {
+  filter: grayscale(1) contrast(1.22) brightness(0.92);
+}
+
+/* ==========================================================================
+   CLEAN, UNIFIED SIMPLE BUTTONS (SAME STYLE ACROSS ALL SECTIONS)
+   ========================================================================== */
+.re-requiem-btn,
+.re-requiem-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border-radius: 0.5rem;
+  padding: 0.62rem 1.2rem;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+  transition: transform 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="light"] .re-requiem-btn,
+[data-theme="light"] .re-requiem-btn-ghost {
+  background-color: var(--bg-card);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.re-requiem-btn:hover,
+.re-requiem-btn-ghost:hover {
+  transform: translateY(-2px);
+  background-color: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text-primary);
 }
